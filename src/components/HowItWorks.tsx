@@ -24,14 +24,14 @@ export const HowItWorks: React.FC = () => {
   ];
 
   return (
-    <section id="how-it-works" className="max-w-[1180px] mx-auto px-4 sm:px-6 my-10 md:my-14 scroll-mt-20">
-      <div className="bg-neutral-50/90 border border-neutral-200/90 rounded-2xl p-8 sm:p-12 text-center">
+    <section id="how-it-works" className="max-w-[1180px] mx-auto px-4 sm:px-6 my-8 md:my-14 scroll-mt-20">
+      <div className="bg-neutral-50/90 border border-neutral-200/90 rounded-2xl p-6 sm:p-10 md:p-12 text-center">
         {/* Header */}
-        <div className="mb-10 sm:mb-14">
-          <span className="text-[11px] font-bold tracking-widest text-neutral-500 uppercase">
+        <div className="mb-8 sm:mb-14">
+          <span className="text-[10px] sm:text-[11px] font-bold tracking-widest text-neutral-500 uppercase">
             HOW IT WORKS
           </span>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-black tracking-tight mt-1.5">
+          <h2 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-black tracking-tight mt-1">
             Simple. Daily. Impactful.
           </h2>
         </div>

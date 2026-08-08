@@ -14,11 +14,11 @@ export const JourneyProgress: React.FC<JourneyProgressProps> = ({
   const daysArray = Array.from({ length: totalDays }, (_, i) => i + 1);
 
   return (
-    <section className="max-w-[1180px] mx-auto px-4 sm:px-6 my-10 md:my-14">
-      <div className="bg-white border border-neutral-200 rounded-2xl p-6 sm:p-8 shadow-2xs">
+    <section className="max-w-[1180px] mx-auto px-4 sm:px-6 my-8 md:my-14">
+      <div className="bg-white border border-neutral-200 rounded-2xl p-4 sm:p-6 md:p-8 shadow-2xs max-w-full overflow-hidden">
         {/* Header Row */}
-        <div className="flex items-center justify-between pb-6 border-b border-neutral-100 mb-6">
-          <span className="text-xs sm:text-sm font-bold text-black tracking-wider uppercase">
+        <div className="flex items-center justify-between pb-4 sm:pb-6 border-b border-neutral-100 mb-4 sm:mb-6">
+          <span className="text-[11px] sm:text-xs md:text-sm font-bold text-black tracking-wider uppercase">
             YOUR 60-DAY JOURNEY
           </span>
           <span className="text-xs sm:text-sm font-extrabold text-black">
@@ -26,9 +26,9 @@ export const JourneyProgress: React.FC<JourneyProgressProps> = ({
           </span>
         </div>
 
-        {/* 60-Day Dots Representation */}
-        <div className="py-2 overflow-x-auto no-scrollbar">
-          <div className="flex items-center justify-between gap-1.5 min-w-[600px] md:min-w-0 py-2">
+        {/* 60-Day Dots Representation Container */}
+        <div className="py-2 w-full overflow-x-auto no-scrollbar">
+          <div className="flex items-center justify-between gap-1 sm:gap-1.5 min-w-[540px] sm:min-w-0 py-2">
             {daysArray.map((dayNum) => {
               const isCompleted = dayNum <= completedDays;
               const isCurrentDay = dayNum === completedDays;

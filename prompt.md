@@ -365,6 +365,13 @@ This iteration focuses on the ABTalks landing page (`/`), based on the provided 
 
 The page introduces the 60-day coding challenge, communicates the core value proposition, and establishes the visual language for the rest of the product.
 
+---
+
+# Prompt 2 — Mobile Responsiveness
+
+<details>
+<summary>Mobile Responsiveness Prompt</summary>
+
 ### Key Changes
 - Landing page redesigned with a minimal black-and-white aesthetic.
 - Mobile-first implementation, with 390px as the primary target.
@@ -372,3 +379,308 @@ The page introduces the 60-day coding challenge, communicates the core value pro
 - Added hero, challenge metrics, How It Works, and 60-day journey sections.
 - Added responsive behavior for mobile, tablet, and desktop.
 - Added lightweight navigation and interaction requirements.
+
+
+Fix the mobile responsiveness of the existing ABTalks landing page.
+IMPORTANT:
+Do NOT redesign the page.
+Do NOT change the desktop design.
+Do NOT add new sections or features.
+The attached screenshot shows the current broken mobile implementation. Use it to identify and fix the problems.
+The page must be genuinely mobile-first and responsive, not simply a scaled-down desktop layout.
+==================================================
+MOBILE TARGET
+Optimize specifically for:
+390 px width
+The page must never create horizontal overflow.
+At any mobile width:
+body must not horizontally scroll
+no element should extend outside the viewport
+text must never overlap
+navbar items must never collide
+images/illustrations must scale within the viewport
+cards must respect the viewport width
+==================================================
+MOBILE NAVBAR
+==================================================
+The current navbar is broken because all desktop navigation items are being forced into one row.
+Create a proper compact mobile navbar.
+Mobile navbar should contain:
+LEFT:
+{} ABTalks
+RIGHT:
+Home
+Dashboard
+Day 12
+Streak
+But make the spacing responsive so these elements never overlap.
+The navbar should:
+remain approximately 56–64px tall
+have horizontal padding around 16–20px
+use smaller typography on mobile
+allow navigation items to shrink appropriately
+never push content outside the viewport
+If all four navigation items cannot comfortably fit at very narrow widths, use a clean mobile navigation treatment rather than allowing overlap.
+Do NOT allow:
+text wrapping inside navigation items
+navbar content being cut off
+streak badge covering other navigation items
+horizontal scrolling
+The screenshot currently shows:
+"ABTalksHome"
+and
+"Day 12"
+colliding.
+This must be completely fixed.
+==================================================
+2. HERO MOBILE LAYOUT
+On mobile, the hero MUST become a single-column layout.
+Order:
+Challenge badge
+Main heading
+Description
+CTA buttons
+Social proof
+Developer illustration
+Do not attempt to keep the desktop two-column layout.
+The hero text should use the full available width with comfortable horizontal padding.
+Use approximately:
+padding-left: 18–20px
+padding-right: 18–20px
+The heading:
+Build for
+60 days.
+must remain on two lines.
+Use responsive typography such as:
+text-[48px] on small mobile
+or an equivalent clamp() value.
+Do not make the heading so large that it causes overflow.
+The heading should have:
+tight line height
+strong font weight
+no horizontal overflow
+==================================================
+3. HERO DESCRIPTION
+The description should wrap naturally:
+Build projects. Share your progress.
+Grow in public. Get noticed.
+Do not force desktop line widths.
+Maximum width should be appropriate for mobile.
+Use muted gray typography and approximately 15–16px font size.
+==================================================
+4. CTA BUTTONS
+The CTA row should work properly on mobile.
+Primary:
+Start Day 1 →
+Secondary:
+How it works ↓
+Keep them on the same row when there is enough room.
+However, at very narrow widths, allow them to wrap or stack cleanly.
+Never let:
+buttons overflow
+text overlap
+buttons become smaller than usable touch targets
+Primary button should remain approximately 48–52px tall.
+==================================================
+5. SOCIAL PROOF
+The current social-proof section is too wide and poorly positioned.
+Create a compact responsive row:
+[avatars] [+10K] Join 10,000+ students
+building in public
+On mobile:
+avatars should remain visible
+reduce avatar size slightly if necessary
+text should wrap naturally
+keep the entire component inside the viewport
+Do NOT let the social-proof section become wider than the screen.
+==================================================
+6. HERO ILLUSTRATION
+This is especially important.
+The desktop illustration currently extends beyond the mobile viewport.
+On mobile:
+move the illustration BELOW the social proof
+center it
+make it responsive
+width: approximately 90–100% of available content width
+max-width should prevent it from becoming oversized
+preserve its proportions
+The browser/code illustration should NOT be cropped horizontally.
+The orbit/dotted circle should also scale with the illustration.
+The floating GitHub/LinkedIn card should remain inside the illustration bounds.
+If necessary, reduce the illustration's internal scale on mobile.
+Do NOT hide the illustration completely unless absolutely necessary.
+==================================================
+7. MOBILE SPACING
+The current page has excessive vertical gaps in some places and cramped elements in others.
+Use a consistent mobile spacing system.
+Approximately:
+Navbar
+↓
+28–32px
+↓
+Challenge badge
+↓
+20–24px
+↓
+Heading
+↓
+18–24px
+↓
+Description
+↓
+28–32px
+↓
+CTA
+↓
+40–48px
+↓
+Social proof
+↓
+40–56px
+↓
+Illustration
+Do not blindly use these exact values.
+Adjust visually based on the reference.
+The page should feel intentional and balanced.
+==================================================
+8. DESKTOP MUST NOT BREAK
+IMPORTANT:
+The desktop version is already close to the intended design.
+Do NOT modify the desktop layout unnecessarily.
+Use responsive Tailwind breakpoints such as:
+mobile:
+default
+tablet:
+md:
+desktop:
+lg:
+The desktop two-column hero should remain.
+The mobile layout should only activate below the appropriate breakpoint.
+==================================================
+9. RESPONSIVE CONTAINER
+Use a proper responsive container.
+Example concept:
+w-full
+max-w-[1200px]
+mx-auto
+px-5
+sm:px-6
+lg:px-8
+Do not use fixed widths that cause mobile overflow.
+Avoid fixed pixel widths for:
+hero
+illustration
+cards
+navigation
+feature sections
+Use:
+width: 100%
+max-width
+min-width: 0
+flex-wrap where appropriate
+responsive grid/flex layouts
+==================================================
+10. OVERFLOW DEBUGGING
+Inspect the entire page for sources of horizontal overflow.
+Check:
+navbar
+hero
+heading
+CTA row
+avatars
+illustration
+floating cards
+orbit decoration
+feature metrics
+How It Works section
+journey dots
+No child element should accidentally create viewport overflow.
+Do NOT solve the problem simply by adding:
+overflow-x-hidden
+to the body.
+That can hide the underlying layout bug.
+Fix the actual sizing/layout problems first.
+You may use overflow-hidden on individual decorative illustration containers where appropriate.
+==================================================
+11. MOBILE FEATURES SECTION
+The four feature metrics should NOT remain as four tiny columns on mobile.
+Change them to a 2 × 2 grid:
+┌─────────────┬─────────────┐
+│ 60 Days │ Build Daily │
+│ consistency │ something...│
+├─────────────┼─────────────┤
+│ 2 Proofs │ Get Noticed │
+│ GitHub... │ recruiters │
+└─────────────┴─────────────┘
+Keep the same visual style.
+==================================================
+12. HOW IT WORKS ON MOBILE
+The 3 steps should become a vertical layout:
+1 Pick a Track
+Choose what you want to build
+2 Build Every Day
+Complete a small project daily
+3 Share & Grow
+Submit 2 proofs and grow in public
+Keep the same minimal visual language.
+The connector should become vertical or be removed if it interferes with the layout.
+==================================================
+13. 60-DAY JOURNEY ON MOBILE
+The 60-day journey must remain usable.
+Do NOT allow 60 dots to force the entire page wider than the viewport.
+Put the journey inside a horizontally scrollable internal container if necessary.
+Important:
+Only the journey itself may scroll horizontally.
+The entire page must NOT scroll horizontally.
+Keep:
+Day 1 Day 60
+and:
+Day 12 / 60
+visually clear.
+==================================================
+14. FINAL RESPONSIVE TEST
+After making the changes, test the page at:
+320 × 800
+360 × 800
+375 × 812
+390 × 844
+414 × 896
+768 × 1024
+1024 × 768
+1440 × 900
+At every size verify:
+✓ No horizontal page overflow
+✓ Navbar does not overlap
+✓ Hero heading does not overflow
+✓ Buttons remain usable
+✓ Social proof fits
+✓ Illustration fits inside viewport
+✓ Feature grid works
+✓ How It Works works
+✓ Journey works
+✓ Desktop design remains intact
+==================================================
+FINAL REQUIREMENT
+The attached screenshot represents the CURRENT BROKEN MOBILE RESULT.
+Do not copy its layout.
+Use it to identify what is wrong.
+The desired result is the SAME ABTalks design and visual identity, but properly adapted for mobile.
+Think of mobile as a deliberately designed responsive composition, not a compressed desktop page.
+Make the changes directly in the existing Next.js/Tailwind implementation.
+Do not create a separate mockup.
+Do not add unnecessary functionality.
+
+## Brief
+
+This iteration focuses on fixing and refining the landing page for mobile devices without changing the existing desktop design.
+
+### Key Changes
+- Converted the hero into a proper single-column mobile layout.
+- Fixed mobile spacing, typography, CTA behavior, and social-proof positioning.
+- Made the developer illustration responsive and prevented horizontal clipping.
+- Changed the feature metrics into a 2 × 2 mobile grid.
+- Changed the How It Works section into a vertical mobile layout.
+- Made the 60-day journey independently horizontally scrollable when necessary.
+- Added responsive container and overflow requirements.
+- Added testing requirements across common mobile, tablet, and desktop viewport sizes.
+- Preserved the existing desktop design and visual identity.
