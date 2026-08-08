@@ -684,3 +684,773 @@ This iteration focuses on fixing and refining the landing page for mobile device
 - Added responsive container and overflow requirements.
 - Added testing requirements across common mobile, tablet, and desktop viewport sizes.
 - Preserved the existing desktop design and visual identity.
+
+---
+
+# Prompt 3 — Student Dashboard
+
+<details>
+<summary>Student Dashboard Prompt</summary>
+
+Build the ABTalks Student Dashboard page shown in the attached reference image.
+
+Tech stack:
+- Next.js 14+ with App Router
+- TypeScript
+- Tailwind CSS
+- Lucide React icons
+- Responsive and mobile-first
+- Static/mock data only
+- No backend
+- No authentication
+- No database
+- No API calls
+
+IMPORTANT:
+The attached reference image is the visual source of truth.
+
+Recreate THIS dashboard only.
+Do not redesign it into a generic SaaS dashboard.
+Do not add additional pages or sections.
+Do not add a sidebar.
+Do not add charts that aren't shown in the reference.
+
+The dashboard should feel like the same ABTalks product as the landing page:
+minimal, monochrome, developer-focused, clean, compact, and editorial.
+
+==================================================
+PAGE
+==================================================
+
+Route:
+
+/dashboard
+
+The existing ABTalks navbar should be reused.
+
+Navbar:
+
+LEFT:
+- `{}` logo
+- ABTalks
+
+CENTER:
+- Home
+- Dashboard
+- Day 12
+
+Dashboard is the active item with a small black underline.
+
+RIGHT:
+- flame icon
+- "11 Day Streak"
+
+Keep the navbar visually consistent with the landing page.
+
+==================================================
+OVERALL VISUAL STYLE
+==================================================
+
+Use the reference image extremely closely.
+
+Style:
+- white background
+- black typography
+- very light gray borders
+- subtle off-white surfaces
+- minimal shadows
+- no gradients
+- no colorful UI
+- no glassmorphism
+- no oversized cards
+- no excessive rounded corners
+
+Typography:
+- Geist / Inter / similar modern sans-serif
+- strong bold headings
+- compact labels
+- muted gray secondary text
+
+The dashboard should feel dense but NOT cluttered.
+
+Main content max-width:
+approximately 1180–1200px
+
+Center the dashboard content horizontally.
+
+Desktop page should have approximately 24–32px horizontal padding.
+
+==================================================
+1. GREETING
+==================================================
+
+At the top of the dashboard content:
+
+"Good evening, Arjun. 👋"
+
+Bold, approximately 15–16px.
+
+Below:
+
+"Let's keep the streak alive."
+
+Small muted gray text.
+
+Keep this section compact.
+
+==================================================
+2. FOUR STAT CARDS
+==================================================
+
+Below the greeting, create four equal-width cards in one horizontal row on desktop.
+
+Card 1:
+
+Icon:
+flame
+
+Value:
+"11"
+
+Label:
+"Day Streak"
+
+Supporting text:
+"You're on a roll! 🔥"
+
+Card 2:
+
+Circular progress indicator:
+20%
+
+Value:
+"20%"
+
+Label:
+"Journey Progress"
+
+Supporting text:
+"12 / 60 days"
+
+Card 3:
+
+Code icon:
+`</>`
+
+Value:
+"12"
+
+Label:
+"Projects Built"
+
+Supporting text:
+"Keep shipping!"
+
+Card 4:
+
+Bar/chart icon
+
+Value:
+"Top 18%"
+
+Label:
+"Your Standing"
+
+Supporting text:
+"Among all builders"
+
+Card design:
+- white background
+- thin #e8e8e8 border
+- subtle 8–10px radius
+- approximately 68–72px tall
+- icon inside a subtle circular/light background
+- value should be bold
+- supporting text small gray
+
+Do not make these cards excessively tall.
+
+On mobile:
+- transform into a 2 × 2 grid
+- maintain readable spacing
+- do not shrink the content excessively
+
+==================================================
+3. MAIN CONTENT GRID
+==================================================
+
+Below the stat cards, create the main dashboard content as a two-column grid.
+
+Desktop:
+
+LEFT COLUMN:
+Today's Challenge
+This Week
+
+RIGHT COLUMN:
+Overall Progress
+Achievements
+
+Approximate proportions:
+left = 1.05
+right = 1
+
+Both columns should align vertically.
+
+Do NOT create a sidebar.
+
+==================================================
+4. TODAY'S CHALLENGE
+==================================================
+
+Create a bordered card.
+
+Header:
+
+Small uppercase label:
+"TODAY'S CHALLENGE"
+
+Main challenge:
+
+Large document/file icon inside a black rounded square.
+
+Title:
+"Build a recruiter-friendly README"
+
+Description:
+"A good README tells your story before you do."
+
+Second description:
+"Make your project easy to understand and impressive."
+
+Keep the text compact.
+
+Add a small metadata row:
+
+clock icon
+"45 min"
+
+Then buttons:
+
+Primary:
+"Start Today's Challenge   →"
+
+Secondary:
+"View Details"
+
+The primary button is black with white text.
+
+The secondary button:
+- white background
+- thin gray border
+- black text
+
+Desktop:
+buttons appear horizontally.
+
+Mobile:
+buttons should stack or become full-width depending on available space.
+
+==================================================
+5. OVERALL PROGRESS
+==================================================
+
+Create a bordered card.
+
+Header:
+"TODAY'S PROGRESS"
+
+Actually use:
+
+"OVERALL PROGRESS"
+
+Below:
+
+"12 / 60 Days"
+
+Large bold text.
+
+"20% Completed"
+
+Small muted text.
+
+Then create a horizontal progress bar:
+- light gray track
+- black progress
+- approximately 20% filled
+
+Below the progress bar, show four compact progress rows:
+
+GitHub Proofs
+12 / 12
+check-circle icon
+
+LinkedIn Proofs
+10 / 12
+empty circle
+
+Days Completed
+12 / 60
+empty circle
+
+Current Streak
+11 Days
+empty circle
+
+Each row:
+- icon on left
+- label
+- value aligned right
+- small status icon on far right
+
+Keep the rows compact.
+
+==================================================
+6. THIS WEEK
+==================================================
+
+Below Today's Challenge, create the weekly activity card.
+
+Header:
+
+"THIS WEEK"
+
+Then seven columns:
+
+Mon
+Tue
+Wed
+Thu
+Fri
+Sat
+Sun
+
+Under each day, show a circular status indicator.
+
+Monday:
+filled black circle + check
+
+Tuesday:
+filled black circle + check
+
+Wednesday:
+filled black circle + check
+
+Thursday:
+filled black circle + check
+
+Friday:
+empty circle
+Current day
+
+Saturday:
+dotted/empty circle
+
+Sunday:
+dotted/empty circle
+
+Below each:
+
+Day 8
+Day 9
+Day 10
+Day 11
+Day 12
+Day 13
+Day 14
+
+At the bottom:
+
+"2 days left this week. You've got this! 💪"
+
+Keep it subtle and compact.
+
+The current day (Day 12) should be visually identifiable without introducing colors.
+
+==================================================
+7. ACHIEVEMENTS
+==================================================
+
+Create a bordered card.
+
+Header:
+
+"ACHIEVEMENTS"
+
+Right side:
+"View all →"
+
+Then three achievement rows.
+
+Achievement 1:
+
+Flame icon
+
+"7 Day Streak"
+"Complete 7 days in a row"
+
+Right:
+check indicator
+
+Achievement 2:
+
+GitHub/code icon
+
+"First Commit"
+"Make your first GitHub commit"
+
+Right:
+check indicator
+
+Achievement 3:
+
+Badge/award icon
+
+"Public Builder"
+"Share 10 updates on LinkedIn"
+
+Right:
+"10 / 10"
+
+Use subtle icon containers.
+
+Do not make achievements colorful.
+
+==================================================
+8. BOTTOM REMINDER BAR
+==================================================
+
+At the bottom of the dashboard content, create a full-width bordered card.
+
+Left:
+calendar icon in a light circular/square container.
+
+Text:
+
+"Don't break the chain!"
+
+Below:
+"Submit your proofs today and keep the streak alive."
+
+Right:
+black button:
+
+"Submit Proofs   →"
+
+On mobile:
+- card content can stack
+- button should become full-width
+- maintain comfortable spacing
+
+==================================================
+9. RESPONSIVE DESIGN
+==================================================
+
+This dashboard MUST be mobile-first.
+
+Do NOT simply shrink the desktop dashboard.
+
+Desktop:
+- navbar horizontal
+- four stat cards in one row
+- main content two columns
+- bottom reminder full width
+
+Tablet:
+- reduce spacing
+- cards may remain 2×2
+- main content may remain two columns if there is enough width
+
+Mobile:
+
+Navbar:
+Keep it compact and prevent any overlap.
+
+Greeting:
+Full width.
+
+Stats:
+2 × 2 grid.
+
+Main content:
+ONE COLUMN.
+
+Order on mobile:
+
+1. Today's Challenge
+2. Overall Progress
+3. This Week
+4. Achievements
+5. Bottom Reminder
+
+Every card should use:
+width: 100%
+max-width: 100%
+min-width: 0
+
+No horizontal overflow.
+
+==================================================
+10. MOBILE NAVBAR
+==================================================
+
+The previous landing page implementation had a mobile navbar problem where:
+
+"ABTalksHome"
+
+and:
+
+"Day 12"
+
+were colliding.
+
+Do NOT repeat that mistake.
+
+At widths:
+320px
+360px
+375px
+390px
+414px
+
+the navbar must remain completely usable.
+
+Do not allow:
+- navigation text overlap
+- streak badge overlap
+- text wrapping inside navigation items
+- horizontal page overflow
+
+If necessary, reduce navbar typography/spacing at very narrow widths.
+
+The navbar should remain visually consistent with the landing page.
+
+==================================================
+11. RESPONSIVE CARD BEHAVIOR
+==================================================
+
+Do not use fixed desktop widths.
+
+Avoid things like:
+
+width: 500px
+
+for cards.
+
+Use responsive grid/flex layouts.
+
+For example:
+
+Desktop:
+grid-template-columns: repeat(4, 1fr)
+
+Mobile:
+grid-template-columns: repeat(2, 1fr)
+
+Main dashboard:
+
+Desktop:
+grid-template-columns: 1fr 1fr
+
+Mobile:
+grid-template-columns: 1fr
+
+All cards should shrink naturally.
+
+==================================================
+12. ICONS
+==================================================
+
+Use Lucide React.
+
+Recommended icons:
+
+Flame
+Code2
+BarChart3
+FileText
+Clock3
+CheckCircle2
+Circle
+CalendarDays
+ArrowRight
+Trophy
+Github
+Linkedin
+Users
+TrendingUp
+
+Keep icon stroke widths consistent.
+
+Do not use random emoji as primary UI icons.
+
+The flame emoji may remain in small supporting text where shown in the reference.
+
+==================================================
+13. DATA
+==================================================
+
+Use static mock data:
+
+User:
+Arjun
+
+Day:
+12
+
+Total Days:
+60
+
+Streak:
+11
+
+Journey Progress:
+20%
+
+Projects:
+12
+
+Standing:
+Top 18%
+
+GitHub Proofs:
+12 / 12
+
+LinkedIn Proofs:
+10 / 12
+
+Days Completed:
+12 / 60
+
+Current Streak:
+11 Days
+
+Challenge:
+Build a recruiter-friendly README
+
+Duration:
+45 min
+
+Achievements:
+7 Day Streak
+First Commit
+Public Builder
+
+==================================================
+14. COMPONENT STRUCTURE
+==================================================
+
+Create reusable components:
+
+DashboardPage
+Navbar
+Greeting
+StatsGrid
+StatCard
+TodaysChallenge
+OverallProgress
+WeeklyProgress
+Achievements
+AchievementItem
+ReminderBar
+
+Keep components clean and maintainable.
+
+Use semantic HTML.
+
+==================================================
+15. DESKTOP VISUAL ACCURACY
+==================================================
+
+Match the reference image closely in:
+
+- card dimensions
+- spacing
+- border thickness
+- typography hierarchy
+- alignment
+- icon placement
+- progress indicators
+- button dimensions
+- whitespace
+
+The dashboard should occupy approximately the same visual density as the reference.
+
+Do not make everything huge.
+
+This is a compact productivity dashboard.
+
+==================================================
+16. FINAL QUALITY CHECK
+==================================================
+
+Test at:
+
+320 × 800
+360 × 800
+375 × 812
+390 × 844
+414 × 896
+768 × 1024
+1024 × 768
+1440 × 900
+
+Verify:
+
+✓ No horizontal page scrolling
+✓ No navbar overlap
+✓ No card overflow
+✓ No text clipping
+✓ No broken grid
+✓ Buttons remain tappable
+✓ Stats become 2×2 on mobile
+✓ Main content becomes one column
+✓ Weekly progress remains readable
+✓ Achievement rows remain readable
+✓ Reminder button works visually
+✓ Desktop remains close to reference
+✓ Mobile looks intentionally designed
+
+MOST IMPORTANT:
+
+This is the ABTalks Dashboard.
+
+Keep the same visual language as the ABTalks landing page.
+
+Do not add:
+- sidebar
+- dark mode
+- analytics charts
+- settings
+- profile page
+- notifications
+- extra dashboard widgets
+- pricing
+- footer
+- unrelated content
+
+Only implement the dashboard shown in the reference image.
+
+</details>
+
+## Brief
+
+This iteration adds the ABTalks Student Dashboard at `/dashboard`, while keeping the same visual language established by the landing page.
+
+### Key Changes
+- Added the Student Dashboard page at `/dashboard`.
+- Reused the existing ABTalks navbar and visual identity.
+- Added greeting and student progress information.
+- Added four responsive stat cards for streak, journey progress, projects, and standing.
+- Added Today's Challenge and Overall Progress sections.
+- Added weekly activity tracking.
+- Added achievements and the bottom reminder/proof submission section.
+- Added mobile-first responsive behavior with a 2 × 2 stats grid and single-column content layout.
+- Added responsive navbar requirements to prevent the previous mobile overlap issue.
+- Added reusable dashboard components and static mock data.
+- Preserved the monochrome, minimal, compact ABTalks design.
+- Added responsive testing requirements across mobile, tablet, and desktop sizes.
+
+### Route
+
+`/dashboard`

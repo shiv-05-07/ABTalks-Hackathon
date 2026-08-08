@@ -27,8 +27,8 @@ export const JourneyProgress: React.FC<JourneyProgressProps> = ({
         </div>
 
         {/* 60-Day Dots Representation Container */}
-        <div className="py-2 w-full overflow-x-auto no-scrollbar">
-          <div className="flex items-center justify-between gap-1 sm:gap-1.5 min-w-[540px] sm:min-w-0 py-2">
+        <div className="pt-8 pb-3 w-full overflow-x-auto no-scrollbar">
+          <div className="flex items-center justify-between gap-1 sm:gap-1.5 min-w-[560px] sm:min-w-0 py-1 px-4">
             {daysArray.map((dayNum) => {
               const isCompleted = dayNum <= completedDays;
               const isCurrentDay = dayNum === completedDays;
@@ -48,10 +48,11 @@ export const JourneyProgress: React.FC<JourneyProgressProps> = ({
                     } ${isCurrentDay ? 'ring-2 ring-black ring-offset-2' : ''}`}
                   />
                   {/* Tooltip on hover */}
-                  <div className="absolute bottom-full mb-2 hidden group-hover:flex flex-col items-center z-20 pointer-events-none">
-                    <div className="bg-black text-white text-[10px] font-bold py-1 px-2 rounded whitespace-nowrap">
+                  <div className="absolute bottom-full mb-1.5 hidden group-hover:flex flex-col items-center z-30 pointer-events-none left-1/2 -translate-x-1/2">
+                    <div className="bg-black text-white text-[10px] font-bold py-1 px-2 rounded-md shadow-md whitespace-nowrap border border-neutral-800">
                       Day {dayNum} {isCompleted ? '✓' : ''}
                     </div>
+                    <div className="w-1.5 h-1.5 bg-black rotate-45 -mt-0.5" />
                   </div>
                 </button>
               );
