@@ -1454,3 +1454,865 @@ This iteration adds the ABTalks Student Dashboard at `/dashboard`, while keeping
 ### Route
 
 `/dashboard`
+
+
+---
+
+# Prompt 4 — Challenge Day
+
+<details>
+<summary>Challenge Day Prompt</summary>
+
+Build the ABTalks Challenge Day page shown in the attached reference image.
+
+Tech stack:
+- Next.js 14+ with App Router
+- TypeScript
+- Tailwind CSS
+- Lucide React icons
+- Responsive and mobile-first
+- Static/mock data only
+- No backend
+- No authentication
+- No database
+- No API calls
+
+IMPORTANT:
+The attached image is the exact visual reference for this page.
+
+Recreate this page closely.
+Do not redesign it into a generic form page.
+Do not add extra features, sections, navigation items, or unrelated content.
+
+This is the ABTalks Day Challenge page.
+
+Route:
+`/day/12`
+
+==================================================
+1. GLOBAL DESIGN LANGUAGE
+==================================================
+
+Keep the exact same visual language as the ABTalks landing page and dashboard:
+
+- Minimal
+- Black and white
+- White background
+- Very light gray borders
+- Subtle gray surfaces
+- Thin borders
+- Small rounded corners
+- Minimal shadows
+- No gradients
+- No colorful UI
+- No glassmorphism
+- No excessive rounded cards
+
+Typography:
+- Geist / Inter / modern sans-serif
+- Strong black headings
+- Compact UI labels
+- Muted gray secondary text
+
+Main content max-width:
+approximately 1180–1200px
+
+Center the content horizontally.
+
+Reuse the existing ABTalks Navbar.
+
+==================================================
+2. NAVBAR
+==================================================
+
+Use the same navbar as the landing page and dashboard.
+
+LEFT:
+`{}` ABTalks
+
+CENTER:
+- Home
+- Dashboard
+- Day 12
+
+Day 12 is the active navigation item.
+
+RIGHT:
+- Flame icon
+- "11 Day Streak"
+
+Navbar:
+- white
+- approximately 56–64px high
+- thin bottom border
+- centered content
+- minimal spacing
+
+Do not introduce a sidebar.
+
+IMPORTANT MOBILE REQUIREMENT:
+
+The navbar must NOT overflow.
+
+At:
+
+320px
+360px
+375px
+390px
+414px
+
+make sure:
+- no items overlap
+- no text gets clipped
+- no horizontal page scroll
+- streak indicator remains usable
+- navigation remains readable
+
+==================================================
+3. PAGE LAYOUT
+==================================================
+
+Desktop layout:
+
+Two main columns.
+
+LEFT:
+Challenge information/sidebar
+
+RIGHT:
+Challenge submission workflow
+
+Approximate ratio:
+
+left: 30–32%
+right: 68–70%
+
+There should be a comfortable gap between the columns.
+
+On mobile:
+Convert the entire page into ONE COLUMN.
+
+Order:
+
+1. Back to Dashboard
+2. Day number
+3. Challenge title
+4. Duration
+5. Challenge description
+6. Why this matters
+7. Deliverables
+8. Skill signal
+9. Submit GitHub Proof
+10. Submit LinkedIn Proof
+11. Review & Submit
+12. Can't complete today?
+
+Do NOT keep the desktop two-column layout on mobile.
+
+==================================================
+4. LEFT CHALLENGE INFORMATION
+==================================================
+
+At the top:
+
+"← Back to Dashboard"
+
+Small muted navigation link.
+
+Make it clickable:
+
+`/dashboard`
+
+Then:
+
+"DAY 12 / 60"
+
+Small uppercase/bold label.
+
+Main title:
+
+"Build a recruiter-
+friendly README"
+
+Keep the intentional line break on desktop.
+
+On mobile it may become:
+
+"Build a recruiter-friendly README"
+
+or naturally wrap based on viewport width.
+
+Do not allow text overflow.
+
+Use a large, bold heading.
+
+Then a small duration pill:
+
+clock icon
+"45 min"
+
+White/light gray background
+thin border
+small rounded corners
+
+==================================================
+5. CHALLENGE DESCRIPTION
+==================================================
+
+Below the duration:
+
+"A good README tells your story before you do."
+
+Then:
+
+"Make your project easy to understand and impressive."
+
+Use small muted gray text.
+
+Keep the width constrained so the text doesn't become too wide.
+
+==================================================
+6. WHY THIS MATTERS
+==================================================
+
+Create a small bordered card.
+
+Header:
+
+lightbulb icon
+
+"Why this matters"
+
+Body:
+
+"Your README is often the first thing recruiters see.
+
+A clear README shows communication, clarity and
+attention to detail."
+
+Use compact text.
+
+Card should feel like an informational callout, NOT a giant card.
+
+==================================================
+7. DELIVERABLES
+==================================================
+
+Create a bordered card:
+
+"Deliverables"
+
+Description:
+
+"Your README must include:"
+
+Then checklist:
+
+✓ Project overview
+
+✓ Tech stack
+
+✓ Installation / Setup
+
+✓ Screenshots (if any)
+
+✓ Key learnings
+
+Use small check-circle icons.
+
+Keep the list compact.
+
+==================================================
+8. SKILL SIGNAL
+==================================================
+
+At the bottom of the left column:
+
+Star icon
+
+"Skill signal"
+
+Below:
+
+"Communication • Documentation • Git"
+
+Use a subtle gray background.
+
+==================================================
+9. SUBMISSION WORKFLOW
+==================================================
+
+The right side contains THREE major workflow cards.
+
+They must appear sequentially.
+
+==================================================
+10. STEP 1 — GITHUB
+==================================================
+
+Card header:
+
+Number circle:
+"1"
+
+Title:
+"Submit GitHub Proof"
+
+Description:
+
+"Push your code to GitHub and submit the commit link."
+
+Then:
+
+"Repository Link"
+
+Input field:
+
+GitHub icon
+
+`https://github.com/arjunmehta/portfolio`
+
+External-link icon on right
+
+Then:
+
+"Commit Link (or latest commit)"
+
+Input field:
+
+GitHub icon
+
+`https://github.com/arjunmehta/portfolio/commit/abc1234def`
+
+External-link icon on right
+
+Below inputs:
+
+Black button:
+
+"◉ Verify GitHub"
+
+On the right side of the card, desktop only, create a verification status card:
+
+check-circle icon
+
+"Verified"
+
+"GitHub proof looks good!"
+
+The verification card should be compact.
+
+On mobile:
+Place the verification status BELOW the GitHub fields rather than beside them.
+
+==================================================
+11. STEP 2 — LINKEDIN
+==================================================
+
+Second card.
+
+Number:
+"2"
+
+Title:
+"Submit LinkedIn Proof"
+
+Description:
+
+"Share your progress on LinkedIn and submit the post link."
+
+Label:
+
+"LinkedIn Post Link"
+
+Input:
+
+LinkedIn icon
+
+`https://www.linkedin.com/posts/arjunmehta_built-readme-day12`
+
+External-link icon on right
+
+Below:
+
+Black button:
+
+"◉ Verify LinkedIn"
+
+Right side desktop:
+
+verification card:
+
+check-circle icon
+
+"Verified"
+
+"LinkedIn proof looks good!"
+
+On mobile:
+Move verification card underneath the form.
+
+==================================================
+12. STEP 3 — REVIEW & SUBMIT
+==================================================
+
+Third card.
+
+Number:
+"3"
+
+Title:
+"Review & Submit"
+
+Description:
+
+"Make sure everything looks good before you submit."
+
+Then create a horizontal review summary.
+
+Three compact cards/sections:
+
+GitHub
+
+GitHub icon
+
+`arjunmehta/portfolio`
+
+`abc1234def`
+
+Divider
+
+LinkedIn
+
+LinkedIn icon
+
+"LinkedIn Post"
+
+"Posted"
+"just now"
+
+Divider
+
+Streak
+
+Flame icon
+
+"11 Day Streak"
+
+"You're on fire! Keep it up."
+
+Then a full-width black button:
+
+"Submit Today's Proof   →"
+
+This button should be prominent.
+
+==================================================
+13. MOBILE REVIEW SECTION
+==================================================
+
+This section is important.
+
+The desktop review summary is horizontal.
+
+On mobile:
+Do NOT squeeze three sections into tiny columns.
+
+Instead use either:
+
+Option A:
+
+GitHub
+--------
+repo
+commit
+
+LinkedIn
+--------
+Posted
+just now
+
+Streak
+--------
+11 Day Streak
+You're on fire!
+
+OR use a compact 1-column/stacked layout.
+
+Everything must remain readable.
+
+The submit button should be:
+
+width: 100%
+
+height: approximately 48–52px
+
+==================================================
+14. CAN'T COMPLETE TODAY
+==================================================
+
+At the bottom:
+
+Small info icon.
+
+"Can't complete today?"
+
+Below:
+
+"You can mark it as skipped and continue tomorrow.
+Your streak will be at risk."
+
+Right side:
+
+"Skip Day  →"
+
+Make this a subtle bottom action area.
+
+Do not make it visually stronger than the submit button.
+
+On mobile:
+Stack the content if necessary.
+
+==================================================
+15. INPUT DESIGN
+==================================================
+
+Inputs should closely resemble the reference.
+
+Use:
+
+- white background
+- thin #dedede border
+- approximately 6–8px radius
+- height around 34–38px desktop
+- approximately 44–48px mobile
+- GitHub/LinkedIn icon on left
+- external-link icon on right
+
+Placeholder/value text:
+small and gray/black.
+
+Inputs must never overflow their cards.
+
+Use:
+
+width: 100%
+min-width: 0
+
+Do not use fixed widths.
+
+==================================================
+16. BUTTON DESIGN
+==================================================
+
+Primary buttons:
+
+Black background
+White text
+Small radius
+Compact height
+
+Examples:
+
+"Verify GitHub"
+"Verify LinkedIn"
+"Submit Today's Proof →"
+
+Secondary:
+white background
+thin gray border
+black text
+
+Buttons should have subtle hover states only.
+
+No exaggerated animations.
+
+==================================================
+17. RESPONSIVE DESIGN
+==================================================
+
+This page MUST be mobile-first.
+
+Desktop:
+Two-column layout.
+
+Tablet:
+Two-column layout if enough space, otherwise transition to one column.
+
+Mobile:
+ONE COLUMN.
+
+Recommended breakpoint:
+
+Desktop:
+lg:grid-cols-[0.42fr_1fr]
+
+Mobile:
+grid-cols-1
+
+Do not use fixed desktop widths.
+
+==================================================
+18. MOBILE SPACING
+==================================================
+
+Use approximately:
+
+Page horizontal padding:
+16–20px
+
+Back link:
+20px below navbar
+
+Day label:
+20–28px below back link
+
+Heading:
+8–12px below day label
+
+Description:
+16–20px below heading
+
+Information cards:
+16px gaps
+
+Workflow cards:
+16px gaps
+
+Do not create huge empty vertical spaces.
+
+The page should remain compact and easy to scan.
+
+==================================================
+19. MOBILE TYPOGRAPHY
+==================================================
+
+Challenge heading:
+
+Desktop:
+approximately 32–38px
+
+Mobile:
+approximately 30–34px
+
+Use tight line height.
+
+Step headings:
+14–16px
+
+Descriptions:
+12–14px
+
+Labels:
+10–12px
+
+Buttons:
+12–14px
+
+Do not let any heading cause horizontal overflow.
+
+==================================================
+20. RESPONSIVE WORKFLOW CARDS
+==================================================
+
+Desktop workflow cards should have:
+
+Header + description
+
+Form fields
+
+Verification card positioned to the right where shown
+
+Mobile workflow cards should become:
+
+Header
+Description
+Input
+Input
+Verify button
+Verification status
+
+Everything stacked vertically.
+
+The card width must always be:
+
+width: 100%
+
+Never allow content to escape the card.
+
+==================================================
+21. DATA
+==================================================
+
+Use these exact mock values:
+
+User:
+Arjun Mehta
+
+Current day:
+12
+
+Total days:
+60
+
+Streak:
+11
+
+Challenge:
+Build a recruiter-friendly README
+
+Duration:
+45 min
+
+Repository:
+https://github.com/arjunmehta/portfolio
+
+Commit:
+https://github.com/arjunmehta/portfolio/commit/abc1234def
+
+LinkedIn:
+https://www.linkedin.com/posts/arjunmehta_built-readme-day12
+
+GitHub:
+Verified
+
+LinkedIn:
+Verified
+
+==================================================
+22. COMPONENT STRUCTURE
+==================================================
+
+Create reusable components:
+
+ChallengeDayPage
+Navbar
+ChallengeSidebar
+ChallengeIntro
+InfoCard
+DeliverablesCard
+SkillSignal
+SubmissionWorkflow
+GithubSubmission
+LinkedinSubmission
+ReviewSubmission
+VerificationStatus
+ProofInput
+SkipDay
+
+Keep the components clean.
+
+Avoid putting the entire page into one massive component.
+
+==================================================
+23. ACCESSIBILITY
+==================================================
+
+Use semantic HTML.
+
+Inputs must have labels.
+
+Buttons must be real buttons.
+
+Links must be real links.
+
+Icons should have accessible labels where appropriate.
+
+Do not rely on icons alone to communicate important actions.
+
+==================================================
+24. MOBILE TESTING
+==================================================
+
+Test specifically at:
+
+320 × 800
+360 × 800
+375 × 812
+390 × 844
+414 × 896
+
+Also test:
+
+768 × 1024
+1024 × 768
+1440 × 900
+
+At every mobile width verify:
+
+✓ No horizontal scrolling
+✓ Navbar does not overlap
+✓ Challenge title does not overflow
+✓ Left information cards fit
+✓ Inputs fit their cards
+✓ Verification cards stack correctly
+✓ Review cards stack correctly
+✓ Buttons are full-width where appropriate
+✓ Skip Day section fits
+✓ No text is clipped
+✓ No fixed-width desktop elements remain
+
+==================================================
+MOST IMPORTANT
+==================================================
+
+The attached reference image is the visual specification.
+
+Reproduce its:
+
+- hierarchy
+- proportions
+- spacing
+- typography
+- borders
+- button styles
+- card structure
+- workflow
+- monochrome appearance
+
+Do not add:
+- sidebar
+- comments
+- chat
+- analytics
+- extra challenges
+- calendar
+- leaderboard
+- profile
+- notifications
+- footer
+- dark mode
+- additional navigation
+
+Only build the ABTalks Day 12 Challenge page shown in the reference.
+
+The mobile version should be a carefully adapted single-column version of this exact design, NOT a squeezed desktop layout.
+
+</details>
+
+## Brief
+
+This iteration adds the ABTalks Challenge Day experience at `/day/12`, completing the three required product screens.
+
+### Key Changes
+- Added the Challenge Day page at `/day/12`.
+- Reused the existing ABTalks navbar and established visual language.
+- Added the Day 12 challenge information and challenge description.
+- Added the "Why this matters", Deliverables, and Skill Signal sections.
+- Added the three-step submission workflow:
+  - GitHub proof
+  - LinkedIn proof
+  - Review & Submit
+- Added verification states for GitHub and LinkedIn submissions.
+- Added a final review summary for GitHub, LinkedIn, and the current streak.
+- Added the "Can't complete today?" skip-day action.
+- Added mobile-first single-column behavior for the entire challenge workflow.
+- Made form inputs, verification cards, review sections, and buttons responsive.
+- Added static mock data for the student and submission links.
+- Added accessibility and responsive testing requirements.
+- Preserved the same minimal, monochrome ABTalks design across all three screens.
+
+### Route
+
+`/day/12`

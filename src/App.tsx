@@ -11,9 +11,10 @@ import { DEFAULT_STUDENT_PROFILE, MOCK_SUBMISSIONS, getChallengeForDay } from '.
 import { StudentProfile, ProofSubmission, RoutePath } from './types';
 
 export default function App() {
-  // Client-side router path state synced with browser address bar
+  // Client-side router path state initialized to /day/12 by default
   const [currentPath, setCurrentPath] = useState<string>(() => {
-    return window.location.pathname || '/';
+    const p = window.location.pathname;
+    return (p && p !== '/') ? p : '/day/12';
   });
 
   // State for student profile & submissions
@@ -23,7 +24,8 @@ export default function App() {
   // Sync browser back/forward history buttons
   useEffect(() => {
     const handlePopState = () => {
-      setCurrentPath(window.location.pathname || '/');
+      const p = window.location.pathname;
+      setCurrentPath((p && p !== '/') ? p : '/day/12');
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -51,12 +53,9 @@ export default function App() {
       [newSubmission.dayId]: newSubmission,
     }));
 
-    // Update streak if it was today's challenge
-    if (newSubmission.dayId === profile.completedDays) {
+    if (newSubmission.dayId === profile.completedDays && newSubmission.status === 'verified') {
       setProfile((prev) => ({
         ...prev,
-        currentStreak: prev.currentStreak + 1,
-        completedDays: Math.min(60, prev.completedDays + 1),
         hasSubmittedToday: true,
       }));
     }
@@ -68,7 +67,7 @@ export default function App() {
     return match ? parseInt(match[1], 10) : 12;
   };
 
-  const isDayRoute = currentPath.startsWith('/day/');
+  const isDayRoute = currentPath.startsWith('/day/') || currentPath === '/day/12';
   const currentDayId = isDayRoute ? getDayIdFromPath(currentPath) : 12;
 
   return (
@@ -111,14 +110,18 @@ export default function App() {
             dayId={currentDayId}
             challenge={getChallengeForDay(currentDayId)}
             existingSubmission={submissions[currentDayId]}
+            streakCount={profile.currentStreak}
             onNavigate={navigate}
             onSubmitProof={handleSubmitProof}
           />
         )}
       </main>
 
-      {/* Footer */}
-      <Footer />
+      {/* Footer only for main home or dashboard */}
+      {currentPath !== '/day/12' && !currentPath.startsWith('/day/') && (
+        <Footer />
+      )}
     </div>
   );
 }
+

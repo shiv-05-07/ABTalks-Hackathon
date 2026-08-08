@@ -18,26 +18,28 @@ export interface StudentProfile {
 
 export interface ProofSubmission {
   dayId: number;
-  githubUrl: string;
+  githubRepoUrl: string;
+  githubCommitUrl: string;
   linkedinUrl: string;
   submittedAt: string; // ISO date or formatted
-  reflection?: string;
-  status: 'verified' | 'pending' | 'missing';
+  isGithubVerified: boolean;
+  isLinkedinVerified: boolean;
+  status: 'verified' | 'pending' | 'skipped';
 }
 
 export interface DayChallenge {
   dayId: number; // 1 to 60
   title: string;
   track: string;
-  summary: string;
+  summaryHeadline: string;
+  summarySubtext: string;
   estimatedMinutes: number;
-  objectives: string[];
-  deliverables: {
-    github: string;
-    linkedin: string;
-  };
-  starterCodeSnippet?: string;
-  resources: { title: string; url: string }[];
+  whyItMatters: string;
+  deliverables: string[];
+  skills: string[];
+  defaultRepoUrl: string;
+  defaultCommitUrl: string;
+  defaultLinkedinUrl: string;
   isCompleted?: boolean;
 }
 
@@ -47,3 +49,4 @@ export interface Track {
   description: string;
   popular?: boolean;
 }
+
