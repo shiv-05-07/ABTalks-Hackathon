@@ -669,7 +669,7 @@ Think of mobile as a deliberately designed responsive composition, not a compres
 Make the changes directly in the existing Next.js/Tailwind implementation.
 Do not create a separate mockup.
 Do not add unnecessary functionality.
-
+</details>
 ## Brief
 
 This iteration focuses on fixing and refining the landing page for mobile devices without changing the existing desktop design.
