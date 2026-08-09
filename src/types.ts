@@ -1,19 +1,28 @@
-export type RoutePath = '/' | '/dashboard' | `/day/${number}` | '/report-card'| string;
+export type RoutePath = '/' | '/dashboard' | `/day/${number}` | '/report-card' | string;
+
+export type DemoMode = 'active' | 'first_day' | 'missed_day' | 'empty';
+
+export type SubmissionStatus = 'verified' | 'pending' | 'skipped' | 'missed' | 'none';
 
 export interface StudentProfile {
   name: string;
   avatarUrl: string;
   college: string;
+  year: string;
   currentTrack: string;
   currentStreak: number;
   longestStreak: number;
-  completedDays: number; // e.g. 12
-  totalDays: number; // 60
-  standingRank: number; // e.g. #142 out of 10,420
+  completedDays: number;
+  totalDays: number;
+  standingRank: number;
+  totalStudents: number;
   githubUsername: string;
   linkedinProfile: string;
   hasSubmittedToday: boolean;
   missedYesterday: boolean;
+  visibilityScore: number;
+  linkedinPostsCount: number;
+  githubCommitsCount: number;
 }
 
 export interface ProofSubmission {
@@ -21,96 +30,95 @@ export interface ProofSubmission {
   githubRepoUrl: string;
   githubCommitUrl: string;
   linkedinUrl: string;
-  submittedAt: string; // ISO date or formatted
+  notes?: string;
+  submittedAt: string;
   isGithubVerified: boolean;
   isLinkedinVerified: boolean;
-  status: 'verified' | 'pending' | 'skipped';
+  status: SubmissionStatus;
 }
 
 export interface DayChallenge {
-  dayId: number; // 1 to 60
+  dayId: number;
   title: string;
   track: string;
   summaryHeadline: string;
   summarySubtext: string;
   estimatedMinutes: number;
+  difficulty: 'Easy' | 'Medium' | 'Stretch';
   whyItMatters: string;
+  brief: string[];
   deliverables: string[];
   skills: string[];
+  acceptanceCriteria: string[];
+  linkedinPrompt: string;
   defaultRepoUrl: string;
   defaultCommitUrl: string;
   defaultLinkedinUrl: string;
-  isCompleted?: boolean;
 }
 
 export interface Track {
   id: string;
   name: string;
   description: string;
+  days: number;
   popular?: boolean;
 }
 
-// Add these interfaces to src/types.ts
-
-export interface SubjectScore {
+export interface Achievement {
   id: string;
-  subjectName: string;
-  marksObtained: number;
-  totalMarks: number;
-  grade?: string;
-  teacherComment?: string;
+  title: string;
+  description: string;
+  earned: boolean;
+  icon: 'flame' | 'commit' | 'share' | 'comeback' | 'focus' | 'rank';
 }
 
-export interface StudentProfile {
-  studentName: string;
-  rollNumber: string;
-  gradeLevel: string; // e.g. "Grade 10", "Grade 12"
-  academicTerm: string; // e.g. "Term 1 - 2026", "Final Semester"
-  schoolName?: string;
-  attendancePercentage: number;
-  conductRating: 'Excellent' | 'Good' | 'Satisfactory' | 'Needs Improvement';
-  teacherNotes?: string;
-  subjects: SubjectScore[];
+export interface WeekDay {
+  dayId: number;
+  label: string;
+  status: 'done' | 'today' | 'upcoming' | 'missed' | 'locked';
 }
 
-export interface AIEvaluationResult {
-  overallGpa: string;
-  overallPercentage: number;
-  performanceBand: string; // e.g. "High Distinction", "Proficient", "Developing"
-  executiveSummary: string;
-  keyStrengths: string[];
-  areasForImprovement: string[];
-  subjectInsights: {
-    subjectName: string;
-    insight: string;
-    recommendation: string;
-  }[];
-  actionableRecommendations: string[];
+export interface RitualStep {
+  id: 'read' | 'build' | 'prove';
+  title: string;
+  detail: string;
+  minutes: number;
 }
-
-export interface FullReportCardData {
-  student: StudentProfile;
-  aiEvaluation: AIEvaluationResult;
-  generatedAt: string;
-}
-
-// Add to src/types.ts
 
 export interface SubmissionProofInput {
   dayId: number;
+  studentName: string;
+  track: string;
   githubUrl: string;
+  commitUrl?: string;
   codeSnippet: string;
   linkedinPostText: string;
   timeSpentMinutes: number;
   submittedAt: string;
 }
 
+export interface GitHubVerification {
+  fullName: string;
+  description: string | null;
+  stars: number;
+  language: string | null;
+  htmlUrl: string;
+  commitSha: string;
+  commitMessage: string;
+  commitAuthor: string;
+  commitDate: string;
+  isPublic: boolean;
+}
+
 export interface AIProofAnalysisResult {
   dayId: number;
-  overallScore: number; // 0 - 100
+  overallScore: number;
+  performanceBand: string;
   isVerified: boolean;
-  codeQualityScore: number; // 0 - 100
-  linkedinPitchScore: number; // 0 - 100
+  codeQualityScore: number;
+  linkedinPitchScore: number;
+  recruiterReadiness: number;
+  consistencySignal: number;
   codeReview: {
     strengths: string[];
     improvements: string[];
@@ -118,10 +126,14 @@ export interface AIProofAnalysisResult {
   };
   linkedinFeedback: {
     visibilityTip: string;
-    recruiterAppealScore: string; // e.g. "High Impact", "Moderate", "Needs Hook"
+    recruiterAppeal: string;
     suggestion: string;
+    hookScore: number;
   };
+  skillSignals: string[];
   timeEfficiencyNote: string;
   generatedBadge: string;
+  nextMove: string;
+  verifiedRepo?: GitHubVerification;
+  engine: 'gemini' | 'heuristic';
 }
-

@@ -1,263 +1,540 @@
-// Location: src/components/StudentReportCard.tsx
-import React, { useState } from 'react';
-import { SubmissionProofInput, AIProofAnalysisResult } from '../types';
-import { analyzeDailySubmission } from '../services/aiReportService';
-import { 
-  Sparkles, 
-  Code2, 
-  Linkedin, 
-  Clock, 
-  Award, 
-  ShieldCheck, 
-  GitCommit, 
-  GitBranch, 
-  AlertCircle, 
-  ExternalLink 
+import React, { useMemo, useState } from 'react';
+import {
+  ArrowRight,
+  Award,
+  CheckCircle2,
+  Github,
+  Linkedin,
+  Loader2,
+  RefreshCw,
+  Sparkles,
+  Target,
+  Zap,
 } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { analyzeDailySubmission } from '../services/aiReportService';
+import { DAY_12_CHALLENGE, DEFAULT_STUDENT_PROFILE } from '../data/mockData';
+import { AIProofAnalysisResult, RoutePath, StudentProfile } from '../types';
+import {
+  AlertBanner,
+  FieldShell,
+  GlassCard,
+  PrimaryButton,
+  ProgressRail,
+  SecondaryButton,
+  SectionEyebrow,
+  VerifyBadge,
+  inputClass,
+} from './ui';
 
-export const StudentReportCard: React.FC = () => {
-  const [form, setForm] = useState<SubmissionProofInput>({
-    dayId: 12,
-    githubUrl: 'https://github.com/shiv-05-07/ABTalks-Hackathon',
-    codeSnippet: `// Day 12 Challenge Solution
-function processSubmission(proof: any) {
-  if (!proof.githubUrl || !proof.linkedinPostText) {
-    throw new Error("Missing mandatory proof of work");
-  }
-  return { status: "verified", timestamp: Date.now() };
-}`,
-    linkedinPostText: `🚀 Day 12 of 60 #ABTalks Coding Challenge completed!
+interface StudentReportCardProps {
+  profile: StudentProfile;
+  onNavigate: (path: RoutePath) => void;
+  initialDayId?: number;
+  initialGithubUrl?: string;
+  initialCommitUrl?: string;
+  initialLinkedinText?: string;
+}
 
-Today I built an AI-powered submission reviewer using React and TypeScript. Learned how to parse prompt responses and handle GitHub API verification.
+const SAMPLE_CODE = `// Day 12 — recruiter-friendly README helpers
+export type ReadmeSection = { title: string; body: string; required: boolean };
 
-#60DaysOfCode #BuildInPublic #WebDev #ReactJS`,
-    timeSpentMinutes: 42,
-    submittedAt: '11:24 PM'
-  });
+export function buildRecruiterReadme(sections: ReadmeSection[]) {
+  const ordered = sections.filter((s) => s.body.trim().length > 0);
+  if (!ordered.length) throw new Error('README needs at least one section');
+  return ordered.map((s) => \`## \${s.title}\\n\\n\${s.body.trim()}\\n\`).join('\\n');
+}`;
 
-  const [analysis, setAnalysis] = useState<AIProofAnalysisResult | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+const SAMPLE_POST =
+  'Day 12/60 of ABTalks — rewrote my project README for recruiters. Led with the product in 3 lines, added setup + one concrete learning. Consistency compounds.';
 
-  const handleAnalyze = async (e: React.FormEvent) => {
-    e.preventDefault();
+export const StudentReportCard: React.FC<StudentReportCardProps> = ({
+  profile,
+  onNavigate,
+  initialDayId = 12,
+  initialGithubUrl,
+  initialCommitUrl,
+  initialLinkedinText,
+}) => {
+  const [dayId, setDayId] = useState(initialDayId);
+  const [studentName, setStudentName] = useState(profile.name || DEFAULT_STUDENT_PROFILE.name);
+  const [track, setTrack] = useState(profile.currentTrack || 'Full-Stack Web');
+  const [githubUrl, setGithubUrl] = useState(
+    initialGithubUrl || 'https://github.com/facebook/react'
+  );
+  const [commitUrl, setCommitUrl] = useState(initialCommitUrl || '');
+  const [codeSnippet, setCodeSnippet] = useState(SAMPLE_CODE);
+  const [linkedinPostText, setLinkedinPostText] = useState(
+    initialLinkedinText || DAY_12_CHALLENGE.linkedinPrompt
+  );
+  const [timeSpentMinutes, setTimeSpentMinutes] = useState(45);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [errorHint, setErrorHint] = useState('');
+  const [result, setResult] = useState<AIProofAnalysisResult | null>(null);
+
+  const canSubmit = useMemo(
+    () =>
+      githubUrl.trim().length > 10 &&
+      (codeSnippet.trim().length > 20 || linkedinPostText.trim().length > 20),
+    [githubUrl, codeSnippet, linkedinPostText]
+  );
+
+  const fillDemo = () => {
+    setDayId(12);
+    setStudentName(DEFAULT_STUDENT_PROFILE.name);
+    setTrack('Full-Stack Web');
+    setGithubUrl('https://github.com/facebook/react');
+    setCommitUrl('');
+    setCodeSnippet(SAMPLE_CODE);
+    setLinkedinPostText(SAMPLE_POST);
+    setTimeSpentMinutes(42);
+    setError('');
+    setErrorHint('');
+  };
+
+  const runAnalysis = async () => {
+    setError('');
+    setErrorHint('');
+    if (!githubUrl.trim()) {
+      setError('GitHub repository URL is required');
+      setErrorHint('Paste a public https://github.com/owner/repo link.');
+      return;
+    }
+    if (!/github\.com\//i.test(githubUrl)) {
+      setError('That doesn’t look like a GitHub URL');
+      setErrorHint('Private or non-GitHub links can’t be verified for authenticity.');
+      return;
+    }
+    if (!codeSnippet.trim() && !linkedinPostText.trim()) {
+      setError('Add code or a LinkedIn caption to score');
+      setErrorHint('We need something to evaluate beyond the repo link alone.');
+      return;
+    }
+
     setLoading(true);
-    setErrorMessage(null);
-
+    setResult(null);
     try {
-      // Calls real GitHub API verification + Gemini AI evaluation
-      const result = await analyzeDailySubmission(form);
-      setAnalysis(result);
-    } catch (err: any) {
-      setErrorMessage(err.message || 'Failed to verify GitHub repository.');
+      const analysis = await analyzeDailySubmission({
+        dayId,
+        studentName,
+        track,
+        githubUrl: githubUrl.trim(),
+        commitUrl: commitUrl.trim() || undefined,
+        codeSnippet,
+        linkedinPostText,
+        timeSpentMinutes,
+        submittedAt: new Date().toISOString(),
+      });
+      setResult(analysis);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Analysis failed. Try again.';
+      setError(message);
+      setErrorHint(
+        /private|not found|404/i.test(message)
+          ? 'Make the repository public, double-check the owner/repo spelling, then retry.'
+          : 'Check your network and URL, or use Load demo data to see a successful run.'
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto px-3 py-4 space-y-4 text-neutral-900 font-sans">
-      {/* Mobile Title Header */}
-      <div className="bg-neutral-900 text-white p-4 rounded-2xl space-y-1">
-        <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold tracking-wider uppercase bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded border border-amber-500/30">
-            Day {form.dayId} AI Proof Reviewer
-          </span>
-          <Award className="w-4 h-4 text-amber-400" />
-        </div>
-        <h1 className="text-xl font-bold tracking-tight">Challenge Report Card</h1>
-        <p className="text-xs text-neutral-400">
-          Verify GitHub repository authenticity & get real AI code + LinkedIn recruiter feedback.
-        </p>
-      </div>
-
-      {/* Error Alert Box (Triggered if GitHub Repo is fake or private) */}
-      {errorMessage && (
-        <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-xl text-xs flex items-start gap-2">
-          <AlertCircle className="w-4 h-4 text-red-500 shrink-0 mt-0.5" />
-          <div>
-            <p className="font-bold">GitHub Verification Error</p>
-            <p className="mt-0.5 text-[11px] text-red-600">{errorMessage}</p>
+    <div className="pb-20 pt-4 sm:pt-6">
+      <div className="mx-auto max-w-6xl space-y-4 px-4 sm:px-6">
+        <div className="relative overflow-hidden rounded-2xl bg-hero-plane text-white">
+          <div className="pointer-events-none absolute inset-0 mesh-grid opacity-50" />
+          <div className="relative p-5 sm:p-7">
+            <p className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-accent)]">
+              <Sparkles className="h-3.5 w-3.5" />
+              AI Report Card
+            </p>
+            <h1 className="mt-2 max-w-2xl font-display text-3xl font-bold tracking-normal sm:text-4xl">
+              Turn today’s proof into a recruiter-ready signal.
+            </h1>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/70 sm:text-base">
+              Live GitHub authenticity check + Gemini coaching. Private or broken links fail loudly —
+              the same way a recruiter’s click would.
+            </p>
           </div>
         </div>
-      )}
 
-      {!analysis ? (
-        <form onSubmit={handleAnalyze} className="bg-white border border-neutral-200 p-4 rounded-2xl shadow-sm space-y-3">
-          <div>
-            <label className="block text-xs font-semibold text-neutral-700 mb-1 flex items-center justify-between">
-              <span>GitHub Repository URL</span>
-              <span className="text-[10px] text-amber-600 font-bold">Real-time Verified</span>
-            </label>
-            <input
-              type="url"
-              required
-              value={form.githubUrl}
-              onChange={e => setForm({ ...form, githubUrl: e.target.value })}
-              className="w-full bg-neutral-50 border border-neutral-200 rounded-lg p-2 text-xs text-neutral-900 focus:outline-none focus:border-neutral-900"
-              placeholder="https://github.com/user/repo"
-            />
-          </div>
+        <AnimatePresence mode="wait">
+          {result ? (
+            <motion.div
+              key="result"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+            >
+              <ReportResult
+                result={result}
+                studentName={studentName}
+                track={track}
+                onReset={() => setResult(null)}
+                onNavigate={onNavigate}
+              />
+            </motion.div>
+          ) : (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="grid gap-4 lg:grid-cols-5"
+            >
+              <GlassCard strong className="space-y-4 p-5 lg:col-span-3">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="font-display text-lg font-bold">Proof intake</h2>
+                  <button
+                    type="button"
+                    onClick={fillDemo}
+                    className="text-xs font-semibold text-[color:var(--color-accent-deep)]"
+                  >
+                    Load demo data
+                  </button>
+                </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-neutral-700 mb-1 flex items-center justify-between">
-              <span>Pasted LinkedIn Post Content</span>
-              <span className="text-[10px] text-neutral-400">No API Key Needed</span>
-            </label>
-            <textarea
-              rows={3}
-              required
-              value={form.linkedinPostText}
-              onChange={e => setForm({ ...form, linkedinPostText: e.target.value })}
-              className="w-full bg-neutral-50 border border-neutral-200 rounded-lg p-2 text-xs text-neutral-900 focus:outline-none focus:border-neutral-900"
-              placeholder="Paste your LinkedIn post caption here..."
-            />
-          </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <FieldShell label="Student name">
+                    <input
+                      value={studentName}
+                      onChange={(e) => setStudentName(e.target.value)}
+                      className={inputClass()}
+                    />
+                  </FieldShell>
+                  <FieldShell label="Track">
+                    <input
+                      value={track}
+                      onChange={(e) => setTrack(e.target.value)}
+                      className={inputClass()}
+                    />
+                  </FieldShell>
+                  <FieldShell label="Day number">
+                    <input
+                      type="number"
+                      value={dayId}
+                      onChange={(e) => setDayId(Math.max(1, Math.min(60, Number(e.target.value) || 1)))}
+                      className={inputClass()}
+                    />
+                  </FieldShell>
+                  <FieldShell label="Minutes spent">
+                    <input
+                      type="number"
+                      value={timeSpentMinutes}
+                      onChange={(e) => setTimeSpentMinutes(Math.max(1, Number(e.target.value) || 1))}
+                      className={inputClass()}
+                    />
+                  </FieldShell>
+                </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-neutral-700 mb-1">
-              Code Snippet / Implementation Logic
-            </label>
-            <textarea
-              rows={3}
-              required
-              value={form.codeSnippet}
-              onChange={e => setForm({ ...form, codeSnippet: e.target.value })}
-              className="w-full bg-neutral-950 font-mono text-[11px] text-amber-300 p-2.5 rounded-lg focus:outline-none"
-              placeholder="// Paste main code function built today..."
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-neutral-700 mb-1">
-              Time Spent Today (Minutes)
-            </label>
-            <input
-              type="number"
-              min="5"
-              max="600"
-              value={form.timeSpentMinutes}
-              onChange={e => setForm({ ...form, timeSpentMinutes: Number(e.target.value) })}
-              className="w-full bg-neutral-50 border border-neutral-200 rounded-lg p-2 text-xs text-neutral-900 focus:outline-none focus:border-neutral-900"
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black hover:bg-neutral-800 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 transition disabled:opacity-50"
-          >
-            {loading ? (
-              <span className="flex items-center gap-2">
-                <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                Verifying GitHub & Analyzing Code...
-              </span>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4 text-amber-400" />
-                <span>Verify GitHub & Generate AI Report</span>
-              </>
-            )}
-          </button>
-        </form>
-      ) : (
-        /* Verified Mobile Report Card Output */
-        <div className="bg-white border border-neutral-200 p-4 rounded-2xl shadow-sm space-y-4">
-          {/* Header Status Badge */}
-          <div className="flex items-center justify-between pb-3 border-b border-neutral-100">
-            <div className="flex items-center gap-1.5">
-              <ShieldCheck className="w-5 h-5 text-emerald-600" />
-              <div>
-                <h3 className="text-xs font-bold text-neutral-900">Day {analysis.dayId} Verified Proof</h3>
-                <p className="text-[10px] text-neutral-500">{analysis.generatedBadge}</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <span className="text-lg font-black text-black">{analysis.overallScore}</span>
-              <span className="text-[10px] text-neutral-400">/100</span>
-            </div>
-          </div>
-
-          {/* Real Verified GitHub Repository Banner */}
-          {analysis.verifiedRepoName && (
-            <div className="bg-neutral-900 text-white p-3 rounded-xl space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-amber-400 flex items-center gap-1">
-                  <GitBranch className="w-3 h-3" /> VERIFIED GITHUB REPO
-                </span>
-                <a 
-                  href={form.githubUrl} 
-                  target="_blank" 
-                  rel="noreferrer" 
-                  className="text-[10px] text-neutral-400 hover:text-white flex items-center gap-0.5"
+                <FieldShell
+                  label="GitHub repository URL"
+                  hint="Must be public — private repos fail verification"
                 >
-                  View <ExternalLink className="w-2.5 h-2.5" />
-                </a>
-              </div>
-              <p className="text-xs font-bold font-mono text-neutral-100">{analysis.verifiedRepoName}</p>
-              {analysis.verifiedCommitMsg && (
-                <p className="text-[11px] text-neutral-400 flex items-center gap-1">
-                  <GitCommit className="w-3 h-3 text-emerald-400 shrink-0" />
-                  <span className="truncate">"{analysis.verifiedCommitMsg}"</span>
-                  {analysis.verifiedCommitSha && (
-                    <span className="text-[10px] font-mono text-amber-300">({analysis.verifiedCommitSha})</span>
+                  <input
+                    value={githubUrl}
+                    onChange={(e) => setGithubUrl(e.target.value)}
+                    placeholder="https://github.com/owner/repo"
+                    className={inputClass(!!error && /github|repo|private|not found/i.test(error))}
+                  />
+                </FieldShell>
+
+                <FieldShell label="Commit URL (optional)">
+                  <input
+                    value={commitUrl}
+                    onChange={(e) => setCommitUrl(e.target.value)}
+                    placeholder="https://github.com/owner/repo/commit/..."
+                    className={inputClass()}
+                  />
+                </FieldShell>
+
+                <FieldShell label="Code snippet from today">
+                  <textarea
+                    value={codeSnippet}
+                    onChange={(e) => setCodeSnippet(e.target.value)}
+                    rows={8}
+                    className={`${inputClass()} resize-y font-mono text-xs leading-relaxed`}
+                  />
+                </FieldShell>
+
+                <FieldShell label="LinkedIn post caption">
+                  <textarea
+                    value={linkedinPostText}
+                    onChange={(e) => setLinkedinPostText(e.target.value)}
+                    rows={4}
+                    className={`${inputClass()} resize-y`}
+                  />
+                </FieldShell>
+
+                {error && (
+                  <AlertBanner tone="danger" title={error}>
+                    {errorHint}
+                  </AlertBanner>
+                )}
+
+                {!canSubmit && !error && (
+                  <AlertBanner tone="warn" title="Not ready to score yet">
+                    Add a GitHub repo URL plus either a code snippet or LinkedIn caption.
+                  </AlertBanner>
+                )}
+
+                <PrimaryButton
+                  className="w-full"
+                  disabled={!canSubmit || loading}
+                  onClick={() => void runAnalysis()}
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Verifying + scoring…
+                    </>
+                  ) : (
+                    <>
+                      Generate AI Report Card
+                      <ArrowRight className="h-4 w-4" />
+                    </>
                   )}
-                </p>
-              )}
-            </div>
+                </PrimaryButton>
+              </GlassCard>
+
+              <aside className="space-y-4 lg:col-span-2">
+                <GlassCard className="p-5">
+                  <h3 className="font-display text-base font-bold">What you get</h3>
+                  <ul className="mt-3 space-y-3 text-sm text-[color:var(--color-ink-soft)]">
+                    <Feature
+                      icon={<Zap className="h-4 w-4" />}
+                      title="Public repo authenticity"
+                      body="Live GitHub API — private/404 fails with a clear reason."
+                    />
+                    <Feature
+                      icon={<Target className="h-4 w-4" />}
+                      title="Dual-signal scoring"
+                      body="Code quality + LinkedIn storytelling for recruiter skim speed."
+                    />
+                    <Feature
+                      icon={<Sparkles className="h-4 w-4" />}
+                      title="Honest fallback"
+                      body="If Gemini is offline, a heuristic engine still returns a full card."
+                    />
+                  </ul>
+                </GlassCard>
+                <AlertBanner tone="info" title="Authenticity tip">
+                  Use a real public repo. Fake or private links will not verify — by design.
+                </AlertBanner>
+              </aside>
+            </motion.div>
           )}
-
-          {/* Metric Ratings */}
-          <div className="grid grid-cols-2 gap-2">
-            <div className="bg-neutral-50 p-2.5 rounded-xl border border-neutral-100">
-              <p className="text-[10px] font-bold text-neutral-500 uppercase flex items-center gap-1">
-                <Code2 className="w-3 h-3 text-neutral-700" /> Code Quality
-              </p>
-              <p className="text-base font-bold text-neutral-900 mt-0.5">{analysis.codeQualityScore}%</p>
-            </div>
-            <div className="bg-neutral-50 p-2.5 rounded-xl border border-neutral-100">
-              <p className="text-[10px] font-bold text-neutral-500 uppercase flex items-center gap-1">
-                <Linkedin className="w-3 h-3 text-sky-600" /> LinkedIn Pitch
-              </p>
-              <p className="text-base font-bold text-neutral-900 mt-0.5">{analysis.linkedinPitchScore}%</p>
-            </div>
-          </div>
-
-          {/* AI Code Review */}
-          <div className="bg-neutral-950 text-white p-3 rounded-xl space-y-2">
-            <p className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">AI Code Review</p>
-            <p className="text-xs text-neutral-300 leading-relaxed">{analysis.codeReview.eleganceSummary}</p>
-            <div className="pt-1">
-              <p className="text-[10px] text-neutral-400 font-bold mb-1">Key Code Strengths:</p>
-              {analysis.codeReview.strengths.map((str, idx) => (
-                <p key={idx} className="text-[11px] text-emerald-400 flex items-center gap-1">
-                  ✓ <span>{str}</span>
-                </p>
-              ))}
-            </div>
-          </div>
-
-          {/* LinkedIn Recruiter Feedback */}
-          <div className="bg-sky-50 border border-sky-100 p-3 rounded-xl space-y-1">
-            <p className="text-[10px] font-bold text-sky-800 uppercase tracking-wider">Recruiter Pitch Feedback</p>
-            <p className="text-xs text-sky-950 font-medium">{analysis.linkedinFeedback.suggestion}</p>
-            <p className="text-[10px] text-sky-700 italic mt-1">Tip: {analysis.linkedinFeedback.visibilityTip}</p>
-          </div>
-
-          {/* Time Efficiency */}
-          <div className="flex items-center gap-2 text-xs text-neutral-600 bg-neutral-50 p-2.5 rounded-xl border border-neutral-100">
-            <Clock className="w-4 h-4 text-neutral-500 shrink-0" />
-            <span>{analysis.timeEfficiencyNote}</span>
-          </div>
-
-          <button
-            onClick={() => setAnalysis(null)}
-            className="w-full bg-neutral-100 hover:bg-neutral-200 text-neutral-800 font-bold py-2 rounded-xl text-xs transition"
-          >
-            Review Another Submission
-          </button>
-        </div>
-      )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
+
+function ReportResult({
+  result,
+  studentName,
+  track,
+  onReset,
+  onNavigate,
+}: {
+  result: AIProofAnalysisResult;
+  studentName: string;
+  track: string;
+  onReset: () => void;
+  onNavigate: (path: RoutePath) => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <GlassCard strong className="p-5 sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <SectionEyebrow>{result.generatedBadge}</SectionEyebrow>
+            <h2 className="mt-1 font-display text-2xl font-bold tracking-normal sm:text-3xl">{studentName}</h2>
+            <p className="mt-1 text-sm text-[color:var(--color-muted)]">
+              Day {result.dayId} · {track} · {result.engine === 'gemini' ? 'Gemini' : 'Heuristic'}
+            </p>
+          </div>
+          <div className="text-center">
+            <ScoreRing score={result.overallScore} />
+            <p className="mt-2 text-sm font-semibold">{result.performanceBand}</p>
+          </div>
+        </div>
+
+        {result.verifiedRepo ? (
+          <div className="mt-5 rounded-xl border border-[color:var(--color-good)]/25 bg-[color:var(--color-good-soft)] p-4">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-[color:var(--color-good)]">
+                <CheckCircle2 className="h-4 w-4" />
+                <p className="text-sm font-semibold">GitHub verified · public</p>
+              </div>
+              <VerifyBadge state="verified" />
+            </div>
+            <p className="mt-2 font-display text-lg font-bold">{result.verifiedRepo.fullName}</p>
+            <p className="mt-1 text-sm text-[color:var(--color-ink-soft)]">
+              <span className="font-mono text-xs">{result.verifiedRepo.commitSha}</span>
+              {' · '}
+              {result.verifiedRepo.commitMessage}
+            </p>
+          </div>
+        ) : (
+          <div className="mt-5">
+            <AlertBanner tone="warn" title="GitHub could not be fully verified">
+              Scores below use pasted proof only. Make the repo public and regenerate for a stronger
+              authenticity signal.
+            </AlertBanner>
+          </div>
+        )}
+      </GlassCard>
+
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <Metric label="Code quality" value={result.codeQualityScore} />
+        <Metric label="LinkedIn pitch" value={result.linkedinPitchScore} />
+        <Metric label="Recruiter ready" value={result.recruiterReadiness} />
+        <Metric label="Consistency" value={result.consistencySignal} />
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <GlassCard strong className="p-5">
+          <h3 className="font-display text-lg font-bold">AI code review</h3>
+          <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-ink-soft)]">
+            {result.codeReview.eleganceSummary}
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <ListBlock title="Strengths" items={result.codeReview.strengths} good />
+            <ListBlock title="Level-ups" items={result.codeReview.improvements} />
+          </div>
+        </GlassCard>
+
+        <GlassCard strong className="p-5">
+          <h3 className="font-display text-lg font-bold">LinkedIn recruiter feedback</h3>
+          <p className="mt-2 text-sm font-semibold text-[color:var(--color-accent-deep)]">
+            Appeal: {result.linkedinFeedback.recruiterAppeal}
+          </p>
+          <p className="mt-2 text-sm text-[color:var(--color-ink-soft)]">
+            {result.linkedinFeedback.visibilityTip}
+          </p>
+          <p className="glass-inset mt-3 rounded-xl p-3 text-sm text-[color:var(--color-ink-soft)]">
+            {result.linkedinFeedback.suggestion}
+          </p>
+        </GlassCard>
+      </div>
+
+      <GlassCard strong className="p-5">
+        <div className="flex items-center gap-2">
+          <Award className="h-4 w-4 text-[color:var(--color-signal)]" />
+          <h3 className="font-display text-lg font-bold">Skill signals</h3>
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {result.skillSignals.map((skill) => (
+            <span
+              key={skill}
+              className="rounded-lg bg-[color:var(--color-accent-soft)] px-2.5 py-1 text-xs font-semibold text-[color:var(--color-accent-deep)]"
+            >
+              {skill}
+            </span>
+          ))}
+        </div>
+        <p className="mt-4 text-sm text-[color:var(--color-muted)]">{result.timeEfficiencyNote}</p>
+        <div className="mt-4 rounded-xl border border-[color:var(--color-accent)]/20 bg-[color:var(--color-accent-soft)] p-4">
+          <SectionEyebrow>Next move</SectionEyebrow>
+          <p className="mt-1 text-sm font-medium">{result.nextMove}</p>
+        </div>
+      </GlassCard>
+
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <SecondaryButton className="flex-1" onClick={onReset}>
+          <RefreshCw className="h-4 w-4" />
+          Analyze another
+        </SecondaryButton>
+        <PrimaryButton className="flex-1" onClick={() => onNavigate('/dashboard')}>
+          Back to dashboard
+          <ArrowRight className="h-4 w-4" />
+        </PrimaryButton>
+      </div>
+    </div>
+  );
+}
+
+function ScoreRing({ score }: { score: number }) {
+  const radius = 36;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (score / 100) * circumference;
+  return (
+    <div className="relative mx-auto h-24 w-24">
+      <svg className="h-24 w-24 -rotate-90" viewBox="0 0 88 88">
+        <circle cx="44" cy="44" r={radius} stroke="rgba(18,28,40,0.1)" strokeWidth="8" fill="none" />
+        <motion.circle
+          cx="44"
+          cy="44"
+          r={radius}
+          stroke="var(--color-accent)"
+          strokeWidth="8"
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="font-mono text-2xl font-bold tabular-nums">{score}</span>
+      </div>
+    </div>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: number }) {
+  return (
+    <GlassCard strong className="p-4">
+      <p className="font-mono text-[10px] font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
+        {label}
+      </p>
+      <p className="mt-1 font-mono text-2xl font-bold tabular-nums">{value}</p>
+      <ProgressRail className="mt-2" value={value} />
+    </GlassCard>
+  );
+}
+
+function ListBlock({ title, items, good }: { title: string; items: string[]; good?: boolean }) {
+  return (
+    <div
+      className={`rounded-xl p-3 ${
+        good ? 'bg-[color:var(--color-good-soft)]' : 'glass-inset'
+      }`}
+    >
+      <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-[color:var(--color-muted)]">
+        {title}
+      </p>
+      <ul className="mt-2 space-y-2">
+        {items.map((item) => (
+          <li key={item} className="text-sm leading-snug text-[color:var(--color-ink-soft)]">
+            {item}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function Feature({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <li className="flex gap-3">
+      <span className="mt-0.5 text-[color:var(--color-accent-deep)]">{icon}</span>
+      <div>
+        <p className="font-semibold text-[color:var(--color-ink)]">{title}</p>
+        <p className="mt-0.5 text-[color:var(--color-muted)]">{body}</p>
+      </div>
+    </li>
+  );
+}

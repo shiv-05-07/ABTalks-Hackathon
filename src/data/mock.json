@@ -1,0 +1,42 @@
+{
+  "challenge": {
+    "name": "ABTalks 60-Day Coding Challenge",
+    "audience": "Indian college students",
+    "totalDays": 60,
+    "dailyProof": ["GitHub commit", "LinkedIn post"]
+  },
+  "student": {
+    "name": "Arjun Mehta",
+    "college": "IIT Delhi",
+    "year": "3rd Year · CS",
+    "track": "Full-Stack Web",
+    "currentStreak": 11,
+    "longestStreak": 11,
+    "completedDays": 11,
+    "totalDays": 60,
+    "standingRank": 142,
+    "totalStudents": 10420,
+    "visibilityScore": 78,
+    "hasSubmittedToday": false,
+    "missedYesterday": false
+  },
+  "day12": {
+    "dayId": 12,
+    "title": "Build a recruiter-friendly README",
+    "summary": "A good README tells your story before you do.",
+    "estimatedMinutes": 45,
+    "deliverables": [
+      "Project overview",
+      "Tech stack",
+      "Installation / setup",
+      "Screenshot or demo link",
+      "Key learnings"
+    ],
+    "proofRequired": ["GitHub repository + commit", "LinkedIn post URL"]
+  },
+  "edgeCases": {
+    "firstDay": { "streak": 0, "completedDays": 0, "day": 1 },
+    "missedDay": { "streak": 0, "missedYesterday": true, "longestStreak": 11 },
+    "emptyProfile": { "name": "", "college": "", "streak": 0, "visibilityScore": 0 }
+  }
+}

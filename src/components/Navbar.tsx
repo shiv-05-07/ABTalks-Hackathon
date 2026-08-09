@@ -1,95 +1,91 @@
 import React from 'react';
-import { Flame, Award } from 'lucide-react';
+import { Flame } from 'lucide-react';
 import { RoutePath } from '../types';
 
 interface NavbarProps {
   currentPath: string;
   onNavigate: (path: RoutePath) => void;
   streakCount?: number;
+  showStreak?: boolean;
 }
+
+const primaryLinks: {
+  path: RoutePath;
+  label: string;
+  short: string;
+  match: (p: string) => boolean;
+}[] = [
+  { path: '/', label: 'Home', short: 'Home', match: (p) => p === '/' },
+  { path: '/dashboard', label: 'Dashboard', short: 'Dash', match: (p) => p === '/dashboard' },
+  { path: '/day/12', label: 'Day 12', short: 'Day 12', match: (p) => p.startsWith('/day/') },
+];
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentPath,
   onNavigate,
-  streakCount = 11,
+  streakCount = 0,
+  showStreak = true,
 }) => {
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-[#dedede] select-none">
-      <div className="max-w-[1180px] mx-auto px-3 sm:px-6 h-14 md:h-16 flex items-center justify-between gap-1.5 sm:gap-4">
-        {/* Left: Brand Logo */}
+    <header className="glass-nav sticky top-0 z-50">
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-2 px-3 sm:h-16 sm:px-6">
         <button
+          type="button"
           onClick={() => onNavigate('/')}
-          className="flex items-center gap-1.5 shrink-0 cursor-pointer focus:outline-none"
+          className="pressable flex shrink-0 items-center focus:outline-none"
           aria-label="ABTalks Home"
         >
-          <span className="font-mono font-bold text-base sm:text-lg text-black tracking-tight">
-            &#123;&#125;
-          </span>
-          <span className="font-bold text-sm sm:text-base md:text-lg text-black tracking-tight">
-            ABTalks
+          <span className="font-display text-[15px] font-bold tracking-normal text-[color:var(--color-ink)] sm:text-lg">
+            <span className="text-[color:var(--color-accent)]">{'{}'}</span> ABTalks
           </span>
         </button>
 
-        {/* Center: Navigation Links */}
-        <nav className="flex items-center gap-3 sm:gap-6 md:gap-8 shrink-0">
+        <nav className="flex items-center gap-0.5 rounded-xl border border-[color:var(--color-line)] bg-white/40 p-1 backdrop-blur-md sm:gap-1">
+          {primaryLinks.map((link) => {
+            const active = link.match(currentPath);
+            return (
+              <button
+                key={link.path}
+                type="button"
+                onClick={() => onNavigate(link.path)}
+                className={`pressable rounded-lg px-2.5 py-1.5 text-[11px] font-semibold transition sm:px-3.5 sm:text-sm ${
+                  active
+                    ? 'bg-[color:var(--color-ink)] text-white shadow-sm'
+                    : 'text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)]'
+                }`}
+              >
+                <span className="sm:hidden">{link.short}</span>
+                <span className="hidden sm:inline">{link.label}</span>
+              </button>
+            );
+          })}
           <button
-            onClick={() => onNavigate('/')}
-            className={`relative text-xs sm:text-sm font-medium transition-colors cursor-pointer focus:outline-none whitespace-nowrap ${
-              currentPath === '/' ? 'text-black font-semibold' : 'text-neutral-500 hover:text-black'
-            }`}
-          >
-            Home
-            {currentPath === '/' && (
-              <span className="absolute -bottom-2.5 sm:-bottom-3.5 left-0 right-0 h-[2px] bg-black rounded-full" />
-            )}
-          </button>
-
-          <button
-            onClick={() => onNavigate('/dashboard')}
-            className={`relative text-xs sm:text-sm font-medium transition-colors cursor-pointer focus:outline-none whitespace-nowrap ${
-              currentPath === '/dashboard' ? 'text-black font-semibold' : 'text-neutral-500 hover:text-black'
-            }`}
-          >
-            Dashboard
-            {currentPath === '/dashboard' && (
-              <span className="absolute -bottom-2.5 sm:-bottom-3.5 left-0 right-0 h-[2px] bg-black rounded-full" />
-            )}
-          </button>
-
-          <button
-            onClick={() => onNavigate('/day/12')}
-            className={`relative text-xs sm:text-sm font-medium transition-colors cursor-pointer focus:outline-none whitespace-nowrap ${
-              currentPath.startsWith('/day/') ? 'text-black font-semibold' : 'text-neutral-500 hover:text-black'
-            }`}
-          >
-            Day 12
-            {currentPath.startsWith('/day/') && (
-              <span className="absolute -bottom-2.5 sm:-bottom-3.5 left-0 right-0 h-[2px] bg-black rounded-full" />
-            )}
-          </button>
-
-          {/* New AI Report Card Link */}
-          <button
+            type="button"
             onClick={() => onNavigate('/report-card')}
-            className={`relative text-xs sm:text-sm font-medium transition-colors cursor-pointer focus:outline-none whitespace-nowrap flex items-center gap-1.5 ${
-              currentPath === '/report-card' ? 'text-black font-semibold' : 'text-neutral-500 hover:text-black'
+            className={`pressable hidden rounded-lg px-3.5 py-1.5 text-sm font-semibold transition lg:inline ${
+              currentPath === '/report-card'
+                ? 'bg-[color:var(--color-ink)] text-white'
+                : 'text-[color:var(--color-muted)] hover:text-[color:var(--color-ink)]'
             }`}
           >
-            <Award className="w-3.5 h-3.5 text-amber-500" />
-            <span>AI Report Card</span>
-            {currentPath === '/report-card' && (
-              <span className="absolute -bottom-2.5 sm:-bottom-3.5 left-0 right-0 h-[2px] bg-black rounded-full" />
-            )}
+            AI Report
           </button>
         </nav>
 
-        {/* Right: Streak Badge */}
-        <div className="flex items-center shrink-0">
-          <div className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-2.5 py-1 rounded-full text-xs font-semibold text-black bg-white border border-[#dedede] whitespace-nowrap">
-            <Flame className="w-3.5 h-3.5 text-black fill-black shrink-0" />
-            <span>{streakCount} <span className="hidden min-[380px]:inline">Day </span>Streak</span>
+        {showStreak ? (
+          <div className="flex items-center gap-1.5 rounded-xl border border-[color:var(--color-line)] bg-white/50 px-2.5 py-1.5 text-[11px] font-semibold text-[color:var(--color-ink)] sm:text-xs">
+            <Flame
+              className={`h-3.5 w-3.5 ${
+                streakCount > 0
+                  ? 'fill-[color:var(--color-signal)] text-[color:var(--color-signal)]'
+                  : 'text-[color:var(--color-muted)]'
+              }`}
+            />
+            <span className="font-mono tabular-nums">{streakCount}</span>
           </div>
-        </div>
+        ) : (
+          <div className="w-9" aria-hidden />
+        )}
       </div>
     </header>
   );
