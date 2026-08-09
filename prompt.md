@@ -1,4 +1,26 @@
-# ABTalks Redesign
+# ABTalks Redesign — Prompt History
+
+This file is the running prompt log for the ABTalks hackathon redesign.
+
+| Prompt | Focus |
+|--------|--------|
+| 1 | Landing page (reference recreation) |
+| 2 | Mobile polish |
+| 3 | Student dashboard |
+| 4 | Challenge Day submission |
+| 5 | AI Report Card + GitHub verify + SPA routing |
+| **6** | Full redesign vs official organizer PS |
+| **7** | AI Report Card + hackathon Stage 1–4 rules |
+| **8** | Perfect `/` `/dashboard` `/day/12` for 390px screenshots |
+| **9** | Glass UI, authentic verification alerts, shared design system |
+| **10** | Full PS rebuild — insane UI, strong GitHub/LinkedIn verify, mobile-first |
+| **11** | Proper fonts + feature-rich platform (deadline, heatmap, cohort, timer…) |
+| **12** | Fix stretched fonts (Syne → Outfit / Plus Jakarta Sans) |
+| **13** | Sync this conversation into `prompt.md` + refresh Master Brief |
+
+Jump to the latest product truth: **[Master Brief](#master-brief-current-product-state)** (end of file).
+
+---
 
 <details>
 <summary>  Prompt 1, click to expand. </summary>Build ONLY the landing/home page shown in the attached reference image.
@@ -2424,23 +2446,372 @@ All previous features and UI layouts remain 100% intact:
 
 </details>
 
-## Brief
+---
 
-This iteration adds the AI Student Report Card feature, real-time public GitHub repository verification, and direct SPA routing fixes while preserving the base application.
+# Prompt 6 — Full Product Redesign Against Official Organizer PS
 
-### Key Changes
-- Added AI-powered Student Report Card at `/report-card`.
-- Integrated real-time GitHub REST API verification for checking public repository existence, latest commit message, and commit SHA hash.
-- Implemented Google Gemini AI integration (`gemini-1.5-flash`) for evaluating code quality and LinkedIn recruiter pitch captions.
-- Solved LinkedIn non-public API restriction by allowing students to paste LinkedIn post captions directly for AI analysis.
-- Resolved direct URL 404 navigation errors by adding `vercel.json` rewrites and updating `App.tsx` initial state handling.
-- Maintained mobile-first responsiveness (390px target) and monochrome visual identity across all screens.
+<details>
+<summary>Prompt 6, click to expand.</summary>
 
-### Route Map
+### User request (conversation)
+Analyze the entire codebase and make the product perfect according to the official organizer problem statement. Ship insane features from the PS, professional UI, and full mobile responsiveness.
 
+### Official PS (authoritative)
+
+**Situation:** ABTalks runs a 60-day coding challenge for Indian college students. Students pick a track, build every day, and maintain a public learning streak by submitting:
+- A GitHub commit
+- A LinkedIn post
+
+Most students use the platform on their phones, late at night after college. The product works — it has never been designed.
+
+**Ship at minimum — three screens:**
+1. Landing Page (`/`) — trust, clarity, motivation to commit to 60 days
+2. Student Dashboard (`/dashboard`) — streak, today’s task, progress, overall completion, standing/achievements
+3. Challenge Day (`/day/12`) — read task, understand build, submit GitHub + LinkedIn proof
+
+**Route Map (exact order for 390px screenshots):**
 ```text
 /
 /dashboard
 /day/12
+```
+
+**Looking for:**
+- Mobile-first (390px), desktop secondary
+- Understandable to a student who never heard of ABTalks
+- Edge cases: first day (no streak), missed day, empty profile
+- At least one thoughtful student-experience idea
+- Mocked data only — no auth, no real accounts, no production DB
+- Out of scope: recruiter dashboard, admin panel, matching current ABTalks stack
+- Any framework OK
+
+### Implementation outcome
+- Stack: Vite + React 19 + TypeScript + Tailwind v4 + Motion + Lucide (not Next.js)
+- Fixed `/` redirect bug that previously forced `/day/12`
+- Design system: Bricolage Grotesque + DM Sans, teal/copper tokens (later evolved to glass)
+- Thoughtful features shipped:
+  - **Tonight’s Ritual** — late-night read → build → prove flow
+  - **Comeback Protocol** — missed-day recovery without shame
+  - **Recruiter Visibility Pulse** — consistency score from public proofs
+- Mock data: `src/data/mockData.ts` + `src/data/mock.json`
+- Files: `ROUTE_MAP.md`, `README.md`, redesigned Landing / Dashboard / ChallengeDay
+
+</details>
+
+---
+
+# Prompt 7 — AI Report Card + Hackathon Evaluation Rules
+
+<details>
+<summary>Prompt 7, click to expand.</summary>
+
+### User request (conversation)
+Implement an insane AI Report Card feature (it was missing). Make it winning. Align with hackathon rules:
+
+**Stage 1 — Eligibility (pass/fail):** public repo, valid repo URL, live demo URL, **AI Usage Log accessible**, registered team, before deadline.
+
+**Stage 2 — Authenticity:** repo not pre-created before kickoff; commit history shows real development; AI Usage Log corresponds to features; prompt history not generic/unrelated.
+
+**Stage 3 — Judging:** two independent judges, 100 points, average; third judge if >15pt spread → median.
+
+**Stage 4 — Live Steer Challenge:** top 6; 20 minutes unseen feature on shared screen with same AI tools.
+
+### Implementation outcome
+- Route: `/report-card` (bonus — not required in screenshot Route Map)
+- `src/services/aiReportService.ts`:
+  - Live GitHub REST verify (`verifyGitHubRepo`)
+  - Gemini analysis (`gemini-2.0-flash` / `gemini-1.5-flash`) via REST
+  - Heuristic fallback when no API key / model failure
+- `src/components/StudentReportCard.tsx` — intake form + animated score result
+- Wired into App router, Navbar (desktop), Dashboard CTA, Day submit success
+- `AI_USAGE_LOG.md` for Stage 1 eligibility + Stage 2 authenticity
+- `.env.example`, `vite.config.ts` `envPrefix: ['VITE_', 'GEMINI_']`, `appType: 'spa'`
+- Types: `SubmissionProofInput`, `GitHubVerification`, `AIProofAnalysisResult`
+
+</details>
+
+---
+
+# Prompt 8 — Perfect the Three PS Screens for Judge Screenshots
+
+<details>
+<summary>Prompt 8, click to expand.</summary>
+
+### User request (conversation)
+Make it way perfect according to the organizer PS again — focus on the three required routes at 390px.
+
+### Implementation outcome
+- Landing: clearer first-time copy (“Build every day. Prove it in public.”), Start Day 1 CTA, GitHub+LinkedIn proof explanation, tracks, social proof
+- Dashboard: PS essentials first (streak, today, progress, standing) → today’s task → progress → Tonight’s Ritual → week → achievements
+- Edge-case simulator moved to **bottom** so default `/dashboard` screenshot stays product-clean
+- Explicit banners: First day / Missed (Comeback) / Empty profile
+- Day 12: “Required proof today” callout (GitHub + LinkedIn) above brief for screenshot clarity
+- Navbar: primary three routes always visible at 390px; AI Report secondary
+- `ROUTE_MAP.md` locked to exactly:
+```text
+/
+/dashboard
+/day/12
+```
+
+</details>
+
+---
+
+# Prompt 9 — Glass UI System, Authentic Verification Alerts, Non–Vibe-Coded Polish
+
+<details>
+<summary>Prompt 9, click to expand.</summary>
+
+### User request (conversation)
+Make non-verifiable states and related UI way better. Better alerts when verification fails. Super authentic. No feature inconsistencies. Professional, non-typical, non–vibe-coded. Add glassmorphism and insane unique UI across the whole project — “100× better.”
+
+### Design direction shipped
+- Shared system in `src/components/ui.tsx`:
+  - `GlassCard`, `AlertBanner`, `VerifyBadge`, `FieldShell`, `PrimaryButton`, `SecondaryButton`, `ProgressRail`, `SectionEyebrow`, `MetaChip`
+- `src/index.css`: glass tokens, grain atmosphere, hero plane, shine-edge, pressable, shimmer progress, IBM Plex Mono
+- Accent language: teal + copper (avoid generic purple SaaS)
+
+### Verification authenticity
+- States: `idle` | `empty` | `verifying` | `verified` | `failed`
+- Day flow validates:
+  - GitHub repo URL shape
+  - Commit URL must include `/commit/` + hex SHA
+  - LinkedIn must look like post/activity (profile-only fails)
+- Clear `AlertBanner` copy for missing / invalid / blocked submit / success
+- AI Report Card fails loudly on private/404 GitHub with actionable hints
+- Same visual language on Landing, Dashboard, Day, Report Card, Navbar, Footer
+
+### Consistency rule
+All product surfaces must use the shared glass + alert + verify primitives — no one-off status UIs.
+
+</details>
+
+---
+
+# Prompt 10 — Full PS Rebuild: Insane UI + Strong Verification
+
+<details>
+<summary>Prompt 10, click to expand.</summary>
+
+### User request (conversation)
+Analyze the entire codebase and make the entire product perfect according to the official organizer PS. Make the UI “way insane,” add features implied by the PS, keep everything professional and mobile-responsive.
+
+**Situation (PS):**
+- ABTalks runs a 60-day coding challenge for Indian college students
+- Students pick a track, build daily, maintain a public learning streak
+- Daily proof: GitHub commit + LinkedIn post
+- Most students use phones late at night after college
+- Product works but has never been designed
+
+**Ship at minimum — three screens:**
+1. Landing `/` — trust, clarity, motivation to commit to 60 days
+2. Student Dashboard `/dashboard` — streak, today’s task, progress, completion, standing/achievements
+3. Challenge Day `/day/12` — read task, understand build, submit GitHub + LinkedIn proof
+
+**Route map (exact order):**
+```text
+/
+/dashboard
+/day/12
+```
+Judges open at **390px** width and screenshot these routes.
+
+**Looking for:**
+- Mobile-first (390px), desktop secondary
+- Understandable to a student who never heard of ABTalks
+- Edge cases: first day (no streak), missed day, empty profile
+- At least one thoughtful student-experience idea
+- Mocked data only (no auth / real accounts / production DB)
+- Out of scope: recruiter dashboard, admin, matching current ABTalks stack
+
+**Extra user emphasis:**
+- Make GitHub URL verification very strong
+- Invalid links → perfect / clear alerts
+- Redesign entire UI to be non-typical, professional-app quality
+
+### What shipped from this prompt
+- Redesigned Landing / Dashboard / Challenge Day (mobile-first)
+- New proof service: `src/services/proofVerifyService.ts`
+  - Live GitHub API (public repo + commit SHA belongs to repo)
+  - Strict LinkedIn post URL rules (profile-only rejected)
+  - Clear danger alerts + field errors
+  - Demo helpers: “Try invalid URLs” / “Try profile (invalid)”
+- Design tokens refreshed (teal + signal orange, atmospheric canvas)
+- Edge-case preview modes on dashboard
+- Thoughtful ideas kept/amplified: Tonight’s Ritual, Comeback Protocol, Visibility Pulse
+
+</details>
+
+---
+
+# Prompt 11 — Proper Fonts + Feature-Rich Platform
+
+<details>
+<summary>Prompt 11, click to expand.</summary>
+
+### User request (conversation)
+“get the fonts proper and make it way feature rich”
+
+### Fonts work (first pass)
+- Self-hosted fonts via `@fontsource` (bundled in Vite build)
+- Initially: Syne Variable (display) + Manrope Variable (body) + JetBrains Mono
+- Fixed family-name mismatch (`Syne Variable` / `Manrope Variable` vs bare names)
+- Headings default to display family in CSS base layer
+
+### Feature-rich additions shipped
+| Feature | Where | Purpose |
+|---------|--------|---------|
+| Midnight IST deadline clock | Dashboard + Day | Soft deadline for tonight’s proof |
+| 60-day signal heatmap | Dashboard | Done / today / missed / jump to day |
+| Day jump | Dashboard | Go straight to any day 1–60 |
+| Milestone road | Dashboard | Day 1 / 7 / 14 / 30 / 45 / 60 checkpoints |
+| Cohort pulse | Dashboard | Live-feeling peer activity feed |
+| Focus timer | Day sidebar | Read 5 / Build 30 / Prove 10 / Full 45 |
+| Streak share card | Dashboard | One-tap LinkedIn-ready share text |
+| Toast host | Global | Verify success/fail feedback |
+| LocalStorage persistence | `src/lib/persist.ts` | Profile + submissions survive refresh |
+| Landing feature strip | `/` | Markets the late-night tooling |
+
+### New source files
+- `src/components/features/DeadlineClock.tsx`
+- `src/components/features/ChallengeHeatmap.tsx`
+- `src/components/features/CohortFeed.tsx`
+- `src/components/features/FocusTimer.tsx`
+- `src/components/features/MilestoneRoad.tsx`
+- `src/components/features/DayJump.tsx`
+- `src/components/features/ToastHost.tsx`
+- `src/components/features/StreakShareCard.tsx`
+- `src/data/featuresData.ts`
+- `src/lib/persist.ts`
+
+</details>
+
+---
+
+# Prompt 12 — Fix Stretched Fonts (Syne → Outfit / Jakarta)
+
+<details>
+<summary>Prompt 12, click to expand.</summary>
+
+### User request (conversation)
+User attached a dashboard screenshot with red circles on:
+1. Navbar logo `{} ABTalks`
+2. Greeting “Good evening, Arjun”
+3. Tonight’s soft deadline countdown `05:38:15`
+
+Complaint: fonts feel **stretched sideways** — website looks horizontally pulled. “make these fonts better… fix all… use better fonts everywhere”
+
+### Root cause
+**Syne** is a wide/extended display face. Combined with `font-extrabold` + `tracking-tight` on headings *and* timers/numbers, the UI felt flattened and stretched.
+
+### Fix shipped
+**New typography stack (self-hosted):**
+- Display / logo / headings → **Outfit Variable** (normal proportions)
+- Body / UI → **Plus Jakarta Sans Variable**
+- Timers, scores, streak digits, stats → **JetBrains Mono** (tabular nums)
+
+**Also adjusted:**
+- Removed aggressive letter-spacing stretch
+- Softened `font-extrabold` → `font-bold` / `font-semibold` on key headings
+- Deadline clock, streak dial, focus timer, visibility score, mini-stats → mono
+- Packages: removed Syne + Manrope; added Outfit + Plus Jakarta Sans
+
+### Packages
+```text
+@fontsource-variable/outfit
+@fontsource-variable/plus-jakarta-sans
+@fontsource/jetbrains-mono
+```
+
+Imported in `src/main.tsx`; families wired in `src/index.css`.
+
+</details>
+
+---
+
+# Prompt 13 — Update prompt.md With Full Conversation Log
+
+<details>
+<summary>Prompt 13, click to expand.</summary>
+
+### User request (conversation)
+“update the above prompts and all previous convos in the prompt.md”
+
+### Action
+Appended Prompts **10–12** (this conversation thread) into `prompt.md`, updated the index table, and refreshed the **Master Brief** so it matches the current shipped product (fonts, verification service, feature modules, persistence).
+
+</details>
+
+---
+
+## Master Brief (current product state)
+
+This document preserves Prompts 1–5 (original iterative build), Prompts 6–9 (PS redesign through glass UI), and Prompts **10–13** (full rebuild, feature-rich pass, font fix, prompt log sync).
+
+### What the app is now
+A **Vite + React 19 + TypeScript + Tailwind v4** SPA redesign of ABTalks for the 60-day coding challenge — mobile-first at **390px**, mock data only, no auth/DB. Proof verification hits the **live GitHub API** where possible; LinkedIn is strict post-URL validation.
+
+### Required screenshot routes
+```text
+/
+/dashboard
+/day/12
+```
+
+### Bonus route
+```text
 /report-card
 ```
+
+### Core features
+| Surface | Essentials |
+|---------|------------|
+| `/` | Brand-first hero, trust, how it works, proof loop, late-night features strip, tracks, CTA |
+| `/dashboard` | Streak dial, deadline clock, today’s task, progress, Visibility Pulse, Tonight’s Ritual, week strip, 60-day heatmap, day jump, milestones, cohort pulse, streak share card, achievements, edge-case previews |
+| `/day/12` | Brief → GitHub (live verify) → LinkedIn → review/submit; focus timer; soft deadline; toast alerts |
+| `/report-card` | Live GitHub verify + Gemini/heuristic recruiter scoring |
+
+### Verification (strong)
+- `src/services/proofVerifyService.ts` — format checks + live GitHub repo/commit lookup
+- Rejects: invalid URLs, private/missing repos, repo↔commit mismatch, LinkedIn profile-only
+- Clear `AlertBanner` + toast + field-level errors
+- Demo buttons to force invalid states for judges
+
+### Thoughtful ideas
+1. Tonight’s Ritual (+ Focus Timer)
+2. Comeback Protocol
+3. Recruiter Visibility Pulse
+4. Midnight IST soft deadline
+5. 60-day signal map + cohort pulse
+6. AI Report Card (bonus)
+
+### Hackathon artifacts
+- `ROUTE_MAP.md` — three required routes
+- `AI_USAGE_LOG.md` — Stage 1/2 AI usage documentation
+- `README.md` — run + PS checklist
+- `prompt.md` — full prompt history (this file)
+- `src/data/mock.json` + `src/data/mockData.ts` — mocked realistic data
+- `src/data/featuresData.ts` — cohort/milestones/heatmap helpers
+
+### Key source map
+- `src/App.tsx` — client router + ToastProvider + localStorage persist
+- `src/main.tsx` — fontsource imports + app mount
+- `src/components/LandingPage.tsx`
+- `src/components/StudentDashboard.tsx`
+- `src/components/ChallengeDay.tsx`
+- `src/components/StudentReportCard.tsx`
+- `src/components/Navbar.tsx` / `Footer.tsx` / `ui.tsx`
+- `src/components/features/*` — deadline, heatmap, cohort, timer, milestones, jump, toasts, share
+- `src/services/proofVerifyService.ts` — strong GitHub/LinkedIn proof checks
+- `src/services/aiReportService.ts` — Gemini + heuristic report card
+- `src/lib/persist.ts` — profile/submissions persistence
+- `src/index.css` — design tokens + glass system + font utilities
+- `vercel.json` — SPA rewrites
+
+### Visual system (current)
+- Fonts: **Outfit Variable** (display), **Plus Jakarta Sans Variable** (body), **JetBrains Mono** (timers/meta/numbers)
+- Glass morphism panels over atmospheric canvas (teal + signal orange — not purple SaaS)
+- Status/alert system for unverified and failed proofs
+- Motion: rise-in, shimmer progress, streak dial, toasts (respects `prefers-reduced-motion`)
+
