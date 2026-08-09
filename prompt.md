@@ -2316,3 +2316,131 @@ This iteration adds the ABTalks Challenge Day experience at `/day/12`, completin
 ### Route
 
 `/day/12`
+# Prompt 5 — AI Student Report Card, Real-Time GitHub Verification & SPA Routing Fixes
+
+<details>
+<summary>Prompt 5, click to expand.</summary>
+
+### Overview
+This update introduces the **AI-Powered Student Report Card** feature, **Real-Time GitHub Repository Verification**, and **SPA Direct Path Routing Fixes** while preserving the core ABTalks monochrome aesthetic, mobile responsiveness (390px viewport), and existing product screens.
+
+---
+
+### 1. SPA Routing Architecture
+- **Framework**: React 18+ with Vite and TypeScript using client-side `window.history.pushState` routing in `src/App.tsx`.
+- **Supported Routes**:
+  - `/` (Landing Page)
+  - `/dashboard` (Student Dashboard)
+  - `/day/12` (Challenge Day & Submission Workflow)
+  - `/report-card` (AI Student Report Card)
+- **Direct Navigation Fix**:
+  - `vercel.json`: Added rewrite rule (`"source": "/(.*)", "destination": "/index.html"`) to prevent 404 errors during direct browser refreshes on subpaths.
+  - `vite.config.ts`: Configured `appType: 'spa'` for local development server fallback.
+  - `src/App.tsx`: Synchronized initial state to preserve exact path (`window.location.pathname || '/'`) with `popstate` event listeners for browser back/forward history navigation.
+
+---
+
+### 2. GitHub Proof Submission Workflow
+- **Location**: `src/components/SubmissionWorkflow.tsx` and `src/components/StudentReportCard.tsx`.
+- **Behavior**:
+  - Students enter GitHub Repository URL (`https://github.com/owner/repo`), optional Commit Link, pasted code snippet, and pasted LinkedIn post caption.
+  - Submission and Verification are decoupled:
+    - **Submitted**: Saves repository and LinkedIn link inputs locally.
+    - **Pending / Unverified**: Displays submission links with a clear "Verify GitHub" trigger button.
+    - **Verified**: Triggering verification checks repository authenticity and updates UI state to "Verified" with a check badge.
+    - **Verification Error**: Displays inline error banner if repository URL is invalid or private, allowing instant editing and retry without resetting form inputs.
+
+---
+
+### 3. GitHub Repository Verification Mechanics
+- **Component / Service**: `src/services/aiReportService.ts` (`verifyGitHubRepo`).
+- **Mechanism**:
+  - Uses public GitHub REST API (`https://api.github.com/repos/{owner}/{repo}`) without requiring user authentication keys.
+  - Verifies public existence of the repository (`200 OK` vs `404 Not Found`).
+  - Fetches real-time latest commit details (`https://api.github.com/repos/{owner}/{repo}/commits?per_page=1`):
+    - Commit SHA Hash (short 7-character string)
+    - Latest Commit Message
+    - Author Name & Commit Timestamp
+  - **Error Handling**: Throws clear validation errors for non-existent or private repositories.
+
+---
+
+### 4. AI Student Report Card Engine
+- **Location**: `src/components/StudentReportCard.tsx`, `ReportCardForm.tsx`, `ReportCardDisplay.tsx`.
+- **AI Integration**:
+  - Integrates Google Gemini API (`gemini-1.5-flash` via `@google/genai` or direct API endpoint) to evaluate student proof of work.
+  - Generates real-time code quality analysis and recruiter pitch feedback based on pasted code snippets and LinkedIn captions (solving LinkedIn's non-public API constraint).
+  - Features smart heuristic fallback evaluation when no API key is present or when offline.
+
+---
+
+### 5. Report Card Content Structure
+The generated report card contains:
+- **Overall Score**: Composite rating out of 100 with Performance Band classification ("High Distinction", "Verified Builder").
+- **Code Quality Score (0–100)**: Evaluates code structure, logic, and edge-case handling.
+- **LinkedIn Pitch Score (0–100)**: Evaluates technical storytelling, clarity, and recruiter appeal.
+- **Verified GitHub Banner**: Displays verified full repository name, commit message, and commit SHA hash.
+- **AI Code Review**: Executive summary of code elegance, demonstrated technical strengths, and improvement suggestions.
+- **LinkedIn Recruiter Feedback**: Actionable recommendations for increasing LinkedIn visibility and engagement.
+- **Time Efficiency Note**: Analysis of time spent vs. execution speed.
+
+---
+
+### 6. GitHub Repository Analysis Scope
+The analysis engine reads and processes:
+- Full GitHub Repository Name & Owner
+- Verified Latest Commit Message and Commit SHA
+- Pasted JavaScript/TypeScript Source Code Snippet
+- Pasted LinkedIn Post Text Caption
+- Completion Duration (Minutes) and Timestamp
+
+---
+
+### 7. Preservation of Existing Base Application
+All previous features and UI layouts remain 100% intact:
+- Landing Page (`/`) with Hero, Feature Metrics, How It Works, and 60-Day Journey.
+- Student Dashboard (`/dashboard`) with Stat Cards, Today's Challenge, Overall Progress, and Weekly Tracker.
+- Challenge Day (`/day/12`) with Deliverables, GitHub/LinkedIn inputs, and Skip Day options.
+- Compact monochrome visual system (`#000000`, `#FFFFFF`, `#DEDEDE`).
+
+---
+
+### 8. Responsive Behavior (Mobile 390px Target)
+- **Mobile (390px)**: Single-column stacked layout, full-width touch targets (48px–52px height buttons), horizontally bounded cards with zero viewport overflow.
+- **Desktop (1180px)**: 2-column layout for forms, reviews, and analytics cards.
+
+---
+
+### 9. File Directory & Component Map
+- `src/services/aiReportService.ts`: GitHub REST API verification (`verifyGitHubRepo`) and Gemini AI evaluation service (`analyzeDailySubmission`).
+- `src/components/StudentReportCard.tsx`: Main AI Report Card component handling submission form, loading states, error handling, and verified output rendering.
+- `src/components/ReportCardForm.tsx`: Input form component for student details, subjects, and proof inputs.
+- `src/components/ReportCardDisplay.tsx`: Presentation card matching the ABTalks dark/monochrome visual system.
+- `src/components/Navbar.tsx`: Header component with `/report-card` nav link integrated into `RoutePath` system.
+- `src/App.tsx`: Application container and client-side router managing view switching for all 4 routes.
+- `src/types.ts`: TypeScript interfaces for `SubmissionProofInput`, `AIProofAnalysisResult`, `StudentProfile`, and `RoutePath`.
+- `vercel.json`: SPA rewrite configuration file for deployment.
+- `vite.config.ts`: Vite build configuration with `appType: 'spa'` fallback.
+
+</details>
+
+## Brief
+
+This iteration adds the AI Student Report Card feature, real-time public GitHub repository verification, and direct SPA routing fixes while preserving the base application.
+
+### Key Changes
+- Added AI-powered Student Report Card at `/report-card`.
+- Integrated real-time GitHub REST API verification for checking public repository existence, latest commit message, and commit SHA hash.
+- Implemented Google Gemini AI integration (`gemini-1.5-flash`) for evaluating code quality and LinkedIn recruiter pitch captions.
+- Solved LinkedIn non-public API restriction by allowing students to paste LinkedIn post captions directly for AI analysis.
+- Resolved direct URL 404 navigation errors by adding `vercel.json` rewrites and updating `App.tsx` initial state handling.
+- Maintained mobile-first responsiveness (390px target) and monochrome visual identity across all screens.
+
+### Route Map
+
+```text
+/
+/dashboard
+/day/12
+/report-card
+```
