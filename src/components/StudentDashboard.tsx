@@ -89,30 +89,144 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           : `Good evening, ${profile.name.split(' ')[0]}`;
 
   return (
-    <div className="pb-16 pt-4 sm:pt-6">
-      <div className="mx-auto max-w-6xl space-y-4 px-4 sm:space-y-5 sm:px-6">
-        {/* Identity + streak hero */}
+    <div className="pb-10 pt-3 sm:pt-5">
+      <div className="mx-auto max-w-6xl space-y-3 px-3 sm:space-y-4 sm:px-6">
+        {/* TOP — primary actions (mobile-first) */}
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => onNavigate('/report-card')}
+            className="pressable col-span-2 flex items-center justify-between gap-3 rounded-2xl bg-[color:var(--color-ink)] px-4 py-3.5 text-left text-white shadow-[0_10px_28px_rgba(11,18,32,0.18)]"
+          >
+            <div className="min-w-0">
+              <p className="inline-flex items-center gap-1 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-accent)]">
+                <Sparkles className="h-3 w-3" /> Main feature
+              </p>
+              <p className="mt-0.5 font-display text-base font-bold">AI Report Card</p>
+              <p className="mt-0.5 text-xs text-white/60">Score tonight’s proof for recruiters</p>
+            </div>
+            <ArrowRight className="h-5 w-5 shrink-0 text-[color:var(--color-accent)]" />
+          </button>
+          <PrimaryButton
+            className="h-12 w-full text-xs sm:text-sm"
+            onClick={() => onNavigate(`/day/${currentDay}`)}
+          >
+            Open Day {currentDay}
+          </PrimaryButton>
+          <button
+            type="button"
+            onClick={() => onNavigate('/day/12')}
+            className="pressable flex h-12 items-center justify-center rounded-xl border border-[color:var(--color-line-strong)] bg-white/60 text-xs font-semibold sm:text-sm"
+          >
+            Jump Day 12
+          </button>
+        </div>
+
+        {!profile.hasSubmittedToday && <DeadlineClock />}
+
+        {/* Today's task — high priority */}
+        <GlassCard strong className="p-4 sm:p-5">
+          <div className="flex items-center gap-2 text-[color:var(--color-muted)]">
+            <Target className="h-3.5 w-3.5" />
+            <SectionEyebrow>Today’s task</SectionEyebrow>
+          </div>
+          <h2 className="mt-2 font-display text-xl font-bold sm:text-2xl">{challenge.title}</h2>
+          <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-muted)]">
+            {challenge.summaryHeadline}
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <MetaChip>{challenge.difficulty}</MetaChip>
+            <MetaChip>{challenge.estimatedMinutes} min</MetaChip>
+            <MetaChip>{challenge.track}</MetaChip>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <div className="glass-inset rounded-xl p-3">
+              <Github className="h-4 w-4" />
+              <p className="mt-1.5 text-xs font-semibold">GitHub proof</p>
+              <p className="text-[11px] text-[color:var(--color-muted)]">Live repo + commit</p>
+            </div>
+            <div className="glass-inset rounded-xl p-3">
+              <Linkedin className="h-4 w-4 text-[#0a66c2]" />
+              <p className="mt-1.5 text-xs font-semibold">LinkedIn proof</p>
+              <p className="text-[11px] text-[color:var(--color-muted)]">Post URL only</p>
+            </div>
+          </div>
+          <PrimaryButton className="mt-4 w-full" onClick={() => onNavigate(`/day/${currentDay}`)}>
+            Start Day {currentDay}
+            <ArrowRight className="h-4 w-4" />
+          </PrimaryButton>
+        </GlassCard>
+
+        {/* Edge alerts right under task */}
+        {demoMode === 'first_day' && (
+          <AlertBanner tone="accent" title="Your streak starts at zero — that’s normal">
+            Submit Day 1’s GitHub commit + LinkedIn post tonight and your flame begins.
+          </AlertBanner>
+        )}
+
+        {demoMode === 'empty' && (
+          <AlertBanner
+            tone="warn"
+            title="Empty profile"
+            action={
+              <PrimaryButton className="h-11" onClick={() => onNavigate('/day/1')}>
+                Start Day 1 anyway
+                <ArrowRight className="h-4 w-4" />
+              </PrimaryButton>
+            }
+          >
+            No college, track, or profiles linked yet — you can still ship Day 1.
+          </AlertBanner>
+        )}
+
+        {profile.missedYesterday && (
+          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+            <AlertBanner
+              tone="signal"
+              title="Comeback Protocol"
+              action={
+                <PrimaryButton
+                  className="h-11 bg-[color:var(--color-ink)] shadow-none hover:bg-[color:var(--color-ink-soft)]"
+                  onClick={() => onNavigate(`/day/${currentDay}`)}
+                >
+                  Restart with Day {currentDay}
+                  <ArrowRight className="h-4 w-4" />
+                </PrimaryButton>
+              }
+            >
+              Missed a day. Best streak {profile.longestStreak} still counts — restart cleanly tonight.
+            </AlertBanner>
+          </motion.div>
+        )}
+
+        {!profile.hasSubmittedToday && demoMode === 'active' && (
+          <AlertBanner tone="info" title="Tonight’s proof is still open">
+            Day {currentDay} isn’t locked. Verify GitHub + LinkedIn to advance your streak.
+          </AlertBanner>
+        )}
+
+        {/* Identity + streak */}
         <GlassCard strong shine className="overflow-hidden p-0">
-          <div className="flex items-stretch gap-0">
-            <div className="min-w-0 flex-1 p-5">
+          <div className="flex items-stretch">
+            <div className="min-w-0 flex-1 p-4 sm:p-5">
               <div className="flex items-start gap-3">
                 {profile.avatarUrl ? (
                   <img
                     src={profile.avatarUrl}
                     alt=""
-                    className="h-12 w-12 rounded-full object-cover ring-2 ring-white/90"
+                    className="h-11 w-11 rounded-full object-cover ring-2 ring-white/90"
                   />
                 ) : (
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--color-canvas-deep)] text-[color:var(--color-muted)]">
-                    <UserRound className="h-6 w-6" />
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[color:var(--color-canvas-deep)] text-[color:var(--color-muted)]">
+                    <UserRound className="h-5 w-5" />
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
                   <SectionEyebrow>Student dashboard</SectionEyebrow>
-                  <h1 className="mt-1 font-display text-2xl font-bold tracking-normal">
+                  <h1 className="mt-0.5 font-display text-xl font-bold tracking-normal sm:text-2xl">
                     {greeting}
                   </h1>
-                  <p className="mt-1 truncate text-sm text-[color:var(--color-muted)]">
+                  <p className="mt-1 truncate text-xs text-[color:var(--color-muted)] sm:text-sm">
                     {demoMode === 'empty'
                       ? 'No college, track, or profiles linked yet'
                       : `${profile.college} · ${profile.year} · ${profile.currentTrack}`}
@@ -120,7 +234,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 </div>
               </div>
 
-              <div className="mt-5 grid grid-cols-3 gap-2">
+              <div className="mt-4 grid grid-cols-3 gap-2">
                 <MiniStat
                   label="Day"
                   value={String(currentDay)}
@@ -143,9 +257,9 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
               </div>
             </div>
 
-            <div className="flex w-[7.25rem] shrink-0 flex-col items-center justify-center border-l border-[color:var(--color-line)] bg-[color:var(--color-accent-soft)]/40 px-2 py-4 sm:w-36">
-              <StreakDial streak={profile.currentStreak} />
-              <p className="mt-2 text-center text-[10px] leading-snug text-[color:var(--color-muted)]">
+            <div className="flex w-[6.5rem] shrink-0 flex-col items-center justify-center border-l border-[color:var(--color-line)] bg-[color:var(--color-accent-soft)]/40 px-1.5 py-3 sm:w-36 sm:px-2">
+              <StreakDial streak={profile.currentStreak} size={76} />
+              <p className="mt-1.5 text-center text-[10px] leading-snug text-[color:var(--color-muted)]">
                 {profile.currentStreak === 0
                   ? profile.missedYesterday
                     ? 'Broken — recover'
@@ -156,115 +270,29 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
         </GlassCard>
 
-        {demoMode === 'first_day' && (
-          <AlertBanner tone="accent" title="Your streak starts at zero — that’s normal">
-            Submit Day 1’s GitHub commit + LinkedIn post tonight and your flame begins. Nothing is
-            broken.
-          </AlertBanner>
-        )}
-
-        {demoMode === 'empty' && (
-          <AlertBanner
-            tone="warn"
-            title="Empty profile"
-            action={
-              <PrimaryButton className="h-11" onClick={() => onNavigate('/day/1')}>
-                Start Day 1 anyway
-                <ArrowRight className="h-4 w-4" />
-              </PrimaryButton>
-            }
-          >
-            No college, track, GitHub, or LinkedIn linked. You can still ship Day 1 — standing and
-            Visibility Pulse stay at zero until proof lands.
-          </AlertBanner>
-        )}
-
-        {profile.missedYesterday && (
-          <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
-            <AlertBanner
-              tone="signal"
-              title="Comeback Protocol"
-              action={
-                <PrimaryButton
-                  className="h-11 bg-[color:var(--color-ink)] shadow-none hover:bg-[color:var(--color-ink-soft)]"
-                  onClick={() => onNavigate(`/day/${currentDay}`)}
-                >
-                  Restart with Day {currentDay}
-                  <ArrowRight className="h-4 w-4" />
-                </PrimaryButton>
-              }
-            >
-              You missed a day. Your {profile.longestStreak}-day best still proves you can show up —
-              restart cleanly tonight without the guilt spiral.
-            </AlertBanner>
-          </motion.div>
-        )}
-
-        {!profile.hasSubmittedToday && demoMode === 'active' && (
-          <AlertBanner tone="info" title="Tonight’s proof is still open">
-            Day {currentDay} isn’t locked yet. GitHub + LinkedIn both need to verify before your
-            streak advances.
-          </AlertBanner>
-        )}
-
-        {!profile.hasSubmittedToday && <DeadlineClock />}
-
-        {/* Today's task */}
-        <GlassCard strong className="p-5">
-          <div className="flex items-center gap-2 text-[color:var(--color-muted)]">
-            <Target className="h-3.5 w-3.5" />
-            <SectionEyebrow>Today’s task</SectionEyebrow>
-          </div>
-          <h2 className="mt-2 font-display text-xl font-bold sm:text-2xl">{challenge.title}</h2>
-          <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-muted)]">
-            {challenge.summaryHeadline}
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <MetaChip>{challenge.difficulty}</MetaChip>
-            <MetaChip>{challenge.estimatedMinutes} min</MetaChip>
-            <MetaChip>{challenge.track}</MetaChip>
-          </div>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <div className="glass-inset rounded-xl p-3">
-              <Github className="h-4 w-4" />
-              <p className="mt-1.5 text-xs font-semibold">GitHub proof</p>
-              <p className="text-[11px] text-[color:var(--color-muted)]">Live repo + commit check</p>
-            </div>
-            <div className="glass-inset rounded-xl p-3">
-              <Linkedin className="h-4 w-4 text-[#0a66c2]" />
-              <p className="mt-1.5 text-xs font-semibold">LinkedIn proof</p>
-              <p className="text-[11px] text-[color:var(--color-muted)]">Post URL · not profile</p>
-            </div>
-          </div>
-          <PrimaryButton className="mt-5 w-full" onClick={() => onNavigate(`/day/${currentDay}`)}>
-            Open Day {currentDay}
-            <ArrowRight className="h-4 w-4" />
-          </PrimaryButton>
-        </GlassCard>
-
-        {/* Progress */}
-        <GlassCard strong className="p-5">
+        {/* Progress + pulse */}
+        <GlassCard strong className="p-4 sm:p-5">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="font-display text-lg font-bold">Progress through the challenge</h2>
+            <h2 className="font-display text-base font-bold sm:text-lg">Challenge progress</h2>
             <span className="font-mono text-sm font-semibold text-[color:var(--color-accent-deep)]">
               {progressPct}%
             </span>
           </div>
-          <ProgressRail className="mt-4" value={progressPct} />
-          <p className="mt-3 text-sm text-[color:var(--color-muted)]">
+          <ProgressRail className="mt-3" value={progressPct} />
+          <p className="mt-2 text-xs text-[color:var(--color-muted)] sm:text-sm">
             {profile.completedDays === 0
               ? '0 of 60 days complete. Day 1 unlocks your standing.'
               : `${profile.completedDays} done · ${profile.totalDays - profile.completedDays} left`}
           </p>
 
-          <div className="mt-5 rounded-xl border border-[color:var(--color-accent)]/20 bg-[color:var(--color-accent-soft)] p-3.5">
+          <div className="mt-4 rounded-xl border border-[color:var(--color-accent)]/20 bg-[color:var(--color-accent-soft)] p-3.5">
             <div className="flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-[color:var(--color-accent-deep)]" />
               <p className="text-sm font-semibold text-[color:var(--color-accent-deep)]">
-                Recruiter Visibility Pulse
+                Visibility Pulse
               </p>
             </div>
-            <div className="mt-3 flex items-end gap-3">
+            <div className="mt-2 flex items-end gap-3">
               <p className="font-mono text-3xl font-bold leading-none tabular-nums">
                 {profile.visibilityScore}
                 <span className="text-base font-semibold text-[color:var(--color-muted)]">
@@ -278,32 +306,24 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                 />
               </div>
             </div>
-            <p className="mt-2 text-xs leading-relaxed text-[color:var(--color-ink-soft)]">
-              {profile.visibilityScore === 0
-                ? 'No public signal yet — verified GitHub + LinkedIn proofs raise this score.'
-                : `${profile.githubCommitsCount} commits · ${profile.linkedinPostsCount} posts counted.`}
-            </p>
           </div>
         </GlassCard>
 
-        {/* Tonight's Ritual — thoughtful idea */}
-        <GlassCard strong className="p-5">
+        {/* Ritual — early on mobile */}
+        <GlassCard strong className="p-4 sm:p-5">
           <SectionEyebrow>
             <span className="inline-flex items-center gap-1.5">
               <Moon className="h-3.5 w-3.5" /> Tonight’s Ritual
             </span>
           </SectionEyebrow>
-          <h2 className="mt-1 font-display text-xl font-bold">
+          <h2 className="mt-1 font-display text-lg font-bold sm:text-xl">
             {profile.hasSubmittedToday
               ? 'You’re done for tonight'
               : `~${challenge.estimatedMinutes} min late-night flow`}
           </h2>
-          <p className="mt-1 text-sm text-[color:var(--color-muted)]">
-            Read the brief, ship a slice, submit verifiable proof.
-          </p>
-          <ol className="mt-4 space-y-2.5">
+          <ol className="mt-3 space-y-2">
             {TONIGHT_RITUAL.map((step, index) => (
-              <li key={step.id} className="glass-inset flex gap-3 rounded-xl p-3">
+              <li key={step.id} className="glass-inset flex gap-3 rounded-xl p-2.5">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[color:var(--color-ink)] font-display text-xs font-bold text-white">
                   {index + 1}
                 </span>
@@ -319,10 +339,10 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </ol>
         </GlassCard>
 
-        {/* Week strip */}
-        <GlassCard strong className="p-5">
-          <h2 className="font-display text-lg font-bold">This week</h2>
-          <div className="mt-4 grid grid-cols-7 gap-1.5">
+        {/* Week + heatmap near top half */}
+        <GlassCard strong className="p-4 sm:p-5">
+          <h2 className="font-display text-base font-bold sm:text-lg">This week</h2>
+          <div className="mt-3 grid grid-cols-7 gap-1.5">
             {week.map((day) => {
               const styles =
                 day.status === 'done'
@@ -340,7 +360,7 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
                   onClick={() => {
                     if (day.status !== 'locked') onNavigate(`/day/${day.dayId}`);
                   }}
-                  className={`pressable flex flex-col items-center rounded-xl px-0.5 py-2.5 text-center ${styles}`}
+                  className={`pressable flex flex-col items-center rounded-xl px-0.5 py-2 text-center ${styles}`}
                 >
                   <span className="text-[10px] font-medium opacity-80">{day.label}</span>
                   <span className="mt-1 font-display text-sm font-bold">{day.dayId}</span>
@@ -350,26 +370,17 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
         </GlassCard>
 
-        <GlassCard strong className="p-5">
+        <GlassCard strong className="p-4 sm:p-5">
           <ChallengeHeatmap
             completedDays={profile.completedDays}
             currentDay={currentDay}
             missedYesterday={profile.missedYesterday}
             onNavigate={onNavigate}
           />
-          <div className="mt-5 border-t border-[color:var(--color-line)] pt-4">
+          <div className="mt-4 border-t border-[color:var(--color-line)] pt-4">
             <DayJump onNavigate={onNavigate} />
           </div>
         </GlassCard>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <GlassCard strong className="p-5">
-            <MilestoneRoad completedDays={profile.completedDays} />
-          </GlassCard>
-          <GlassCard strong className="p-5">
-            <CohortFeed />
-          </GlassCard>
-        </div>
 
         <StreakShareCard
           name={profile.name}
@@ -378,10 +389,18 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           track={profile.currentTrack}
         />
 
-        {/* Achievements / standing */}
-        <GlassCard strong className="p-5">
-          <h2 className="font-display text-lg font-bold">Standing & achievements</h2>
-          <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
+          <GlassCard strong className="p-4 sm:p-5">
+            <MilestoneRoad completedDays={profile.completedDays} />
+          </GlassCard>
+          <GlassCard strong className="p-4 sm:p-5">
+            <CohortFeed />
+          </GlassCard>
+        </div>
+
+        <GlassCard strong className="p-4 sm:p-5">
+          <h2 className="font-display text-base font-bold sm:text-lg">Standing & achievements</h2>
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-2.5">
             {achievements.map((item) => {
               const Icon = achievementIcon[item.icon];
               return (
@@ -408,32 +427,17 @@ export const StudentDashboard: React.FC<StudentDashboardProps> = ({
           </div>
         </GlassCard>
 
-        <button
-          type="button"
-          onClick={() => onNavigate('/report-card')}
-          className="glass pressable flex w-full items-center justify-between gap-3 rounded-2xl px-5 py-4 text-left"
-        >
-          <div>
-            <SectionEyebrow>Bonus</SectionEyebrow>
-            <p className="mt-0.5 font-display text-base font-bold">AI Report Card</p>
-            <p className="mt-0.5 text-xs text-[color:var(--color-muted)]">
-              Score today’s proof — fails honestly when links aren’t public
-            </p>
-          </div>
-          <ArrowRight className="h-4 w-4 shrink-0 text-[color:var(--color-muted)]" />
-        </button>
-
-        <div className="rounded-2xl border border-dashed border-[color:var(--color-line-strong)] bg-white/35 p-4">
+        <div className="rounded-2xl border border-dashed border-[color:var(--color-line-strong)] bg-white/35 p-3.5">
           <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-muted)]">
             Preview edge cases
           </p>
-          <div className="mt-2.5 flex gap-1.5 overflow-x-auto no-scrollbar">
+          <div className="mt-2 flex gap-1.5 overflow-x-auto no-scrollbar">
             {(
               [
-                ['active', 'Active streak'],
+                ['active', 'Active'],
                 ['first_day', 'First day'],
-                ['missed_day', 'Missed day'],
-                ['empty', 'Empty profile'],
+                ['missed_day', 'Missed'],
+                ['empty', 'Empty'],
               ] as const
             ).map(([mode, label]) => (
               <button

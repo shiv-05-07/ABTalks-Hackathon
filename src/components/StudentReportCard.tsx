@@ -4,12 +4,13 @@ import {
   Award,
   CheckCircle2,
   Github,
-  Linkedin,
   Loader2,
   RefreshCw,
   Sparkles,
   Target,
   Zap,
+  ShieldCheck,
+  Brain,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { analyzeDailySubmission } from '../services/aiReportService';
@@ -80,6 +81,15 @@ export const StudentReportCard: React.FC<StudentReportCardProps> = ({
     [githubUrl, codeSnippet, linkedinPostText]
   );
 
+  const readiness = useMemo(() => {
+    let n = 0;
+    if (githubUrl.trim().length > 10) n += 1;
+    if (codeSnippet.trim().length > 20) n += 1;
+    if (linkedinPostText.trim().length > 20) n += 1;
+    if (commitUrl.trim().length > 10) n += 1;
+    return n;
+  }, [githubUrl, codeSnippet, linkedinPostText, commitUrl]);
+
   const fillDemo = () => {
     setDayId(12);
     setStudentName(DEFAULT_STUDENT_PROFILE.name);
@@ -142,24 +152,73 @@ export const StudentReportCard: React.FC<StudentReportCardProps> = ({
   };
 
   return (
-    <div className="pb-20 pt-4 sm:pt-6">
-      <div className="mx-auto max-w-6xl space-y-4 px-4 sm:px-6">
+    <div className="pb-10 pt-3 sm:pt-5">
+      <div className="mx-auto max-w-6xl space-y-3 px-3 sm:space-y-4 sm:px-6">
+        {/* Hero — brand the AI Report as the main product surface */}
         <div className="relative overflow-hidden rounded-2xl bg-hero-plane text-white">
           <div className="pointer-events-none absolute inset-0 mesh-grid opacity-50" />
-          <div className="relative p-5 sm:p-7">
-            <p className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-accent)]">
+          <div className="pointer-events-none absolute -right-10 top-0 h-40 w-40 rounded-full bg-[color:var(--color-accent)]/30 blur-3xl" />
+          <div className="relative p-4 sm:p-7">
+            <p className="inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-accent)]">
               <Sparkles className="h-3.5 w-3.5" />
-              AI Report Card
+              Flagship · AI Report Card
             </p>
-            <h1 className="mt-2 max-w-2xl font-display text-3xl font-bold tracking-normal sm:text-4xl">
-              Turn today’s proof into a recruiter-ready signal.
+            <h1 className="mt-3 font-display text-[1.65rem] font-bold leading-tight tracking-normal sm:text-4xl">
+              Recruiter-ready signal from tonight’s proof.
             </h1>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/70 sm:text-base">
-              Live GitHub authenticity check + Gemini coaching. Private or broken links fail loudly —
-              the same way a recruiter’s click would.
+            <p className="mt-2 max-w-xl text-sm leading-relaxed text-white/65 sm:text-base">
+              Live GitHub authenticity + dual scoring (code + LinkedIn). Private links fail loudly —
+              same as a recruiter click.
             </p>
+
+            <div className="mt-4 grid grid-cols-3 gap-2">
+              <HeroStat icon={<ShieldCheck className="h-3.5 w-3.5" />} label="Live verify" />
+              <HeroStat icon={<Brain className="h-3.5 w-3.5" />} label="Gemini AI" />
+              <HeroStat icon={<Target className="h-3.5 w-3.5" />} label="Honest fail" />
+            </div>
           </div>
         </div>
+
+        {/* Sticky generate bar — always at top of form flow */}
+        {!result && (
+          <div className="sticky top-[6.5rem] z-30 space-y-2 rounded-2xl border border-[color:var(--color-line)] bg-white/92 p-2.5 shadow-sm backdrop-blur-xl sm:top-[7rem]">
+            <div className="flex items-center justify-between gap-2 px-1">
+              <p className="text-xs font-semibold text-[color:var(--color-ink-soft)]">
+                Intake ready · {readiness}/4 signals
+              </p>
+              <button
+                type="button"
+                onClick={fillDemo}
+                className="text-[11px] font-semibold text-[color:var(--color-accent-deep)]"
+              >
+                Load demo
+              </button>
+            </div>
+            <div className="mb-1 h-1.5 overflow-hidden rounded-full bg-[color:var(--color-canvas-deep)]">
+              <div
+                className="h-full rounded-full bg-[color:var(--color-accent)] transition-all"
+                style={{ width: `${(readiness / 4) * 100}%` }}
+              />
+            </div>
+            <PrimaryButton
+              className="w-full"
+              disabled={!canSubmit || loading}
+              onClick={() => void runAnalysis()}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Verifying + scoring…
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4" />
+                  Generate AI Report Card
+                </>
+              )}
+            </PrimaryButton>
+          </div>
+        )}
 
         <AnimatePresence mode="wait">
           {result ? (
@@ -182,21 +241,48 @@ export const StudentReportCard: React.FC<StudentReportCardProps> = ({
               key="form"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              className="grid gap-4 lg:grid-cols-5"
+              className="space-y-3"
             >
-              <GlassCard strong className="space-y-4 p-5 lg:col-span-3">
+              {/* Features first on mobile */}
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                <FeatureChip
+                  icon={<Zap className="h-4 w-4" />}
+                  title="Public authenticity"
+                  body="Live GitHub API — private/404 fails clear."
+                />
+                <FeatureChip
+                  icon={<Target className="h-4 w-4" />}
+                  title="Dual-signal score"
+                  body="Code quality + LinkedIn pitch."
+                />
+                <FeatureChip
+                  icon={<Sparkles className="h-4 w-4" />}
+                  title="Honest fallback"
+                  body="Heuristic engine if Gemini is offline."
+                />
+              </div>
+
+              {error && (
+                <AlertBanner tone="danger" title={error}>
+                  {errorHint}
+                </AlertBanner>
+              )}
+
+              {!canSubmit && !error && (
+                <AlertBanner tone="warn" title="Not ready to score yet">
+                  Add a GitHub repo URL plus either a code snippet or LinkedIn caption.
+                </AlertBanner>
+              )}
+
+              <GlassCard strong className="space-y-3.5 p-4 sm:p-5">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="font-display text-lg font-bold">Proof intake</h2>
-                  <button
-                    type="button"
-                    onClick={fillDemo}
-                    className="text-xs font-semibold text-[color:var(--color-accent-deep)]"
-                  >
-                    Load demo data
-                  </button>
+                  <span className="font-mono text-[10px] font-semibold uppercase tracking-wider text-[color:var(--color-muted)]">
+                    Day {dayId}
+                  </span>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid grid-cols-2 gap-2.5">
                   <FieldShell label="Student name">
                     <input
                       value={studentName}
@@ -215,7 +301,9 @@ export const StudentReportCard: React.FC<StudentReportCardProps> = ({
                     <input
                       type="number"
                       value={dayId}
-                      onChange={(e) => setDayId(Math.max(1, Math.min(60, Number(e.target.value) || 1)))}
+                      onChange={(e) =>
+                        setDayId(Math.max(1, Math.min(60, Number(e.target.value) || 1)))
+                      }
                       className={inputClass()}
                     />
                   </FieldShell>
@@ -254,7 +342,7 @@ export const StudentReportCard: React.FC<StudentReportCardProps> = ({
                   <textarea
                     value={codeSnippet}
                     onChange={(e) => setCodeSnippet(e.target.value)}
-                    rows={8}
+                    rows={6}
                     className={`${inputClass()} resize-y font-mono text-xs leading-relaxed`}
                   />
                 </FieldShell>
@@ -263,22 +351,10 @@ export const StudentReportCard: React.FC<StudentReportCardProps> = ({
                   <textarea
                     value={linkedinPostText}
                     onChange={(e) => setLinkedinPostText(e.target.value)}
-                    rows={4}
+                    rows={3}
                     className={`${inputClass()} resize-y`}
                   />
                 </FieldShell>
-
-                {error && (
-                  <AlertBanner tone="danger" title={error}>
-                    {errorHint}
-                  </AlertBanner>
-                )}
-
-                {!canSubmit && !error && (
-                  <AlertBanner tone="warn" title="Not ready to score yet">
-                    Add a GitHub repo URL plus either a code snippet or LinkedIn caption.
-                  </AlertBanner>
-                )}
 
                 <PrimaryButton
                   className="w-full"
@@ -299,31 +375,9 @@ export const StudentReportCard: React.FC<StudentReportCardProps> = ({
                 </PrimaryButton>
               </GlassCard>
 
-              <aside className="space-y-4 lg:col-span-2">
-                <GlassCard className="p-5">
-                  <h3 className="font-display text-base font-bold">What you get</h3>
-                  <ul className="mt-3 space-y-3 text-sm text-[color:var(--color-ink-soft)]">
-                    <Feature
-                      icon={<Zap className="h-4 w-4" />}
-                      title="Public repo authenticity"
-                      body="Live GitHub API — private/404 fails with a clear reason."
-                    />
-                    <Feature
-                      icon={<Target className="h-4 w-4" />}
-                      title="Dual-signal scoring"
-                      body="Code quality + LinkedIn storytelling for recruiter skim speed."
-                    />
-                    <Feature
-                      icon={<Sparkles className="h-4 w-4" />}
-                      title="Honest fallback"
-                      body="If Gemini is offline, a heuristic engine still returns a full card."
-                    />
-                  </ul>
-                </GlassCard>
-                <AlertBanner tone="info" title="Authenticity tip">
-                  Use a real public repo. Fake or private links will not verify — by design.
-                </AlertBanner>
-              </aside>
+              <AlertBanner tone="info" title="Authenticity tip">
+                Use a real public repo. Fake or private links will not verify — by design.
+              </AlertBanner>
             </motion.div>
           )}
         </AnimatePresence>
@@ -331,6 +385,39 @@ export const StudentReportCard: React.FC<StudentReportCardProps> = ({
     </div>
   );
 };
+
+function HeroStat({ icon, label }: { icon: React.ReactNode; label: string }) {
+  return (
+    <div className="rounded-xl border border-white/10 bg-white/5 px-2 py-2.5 text-center">
+      <div className="mx-auto flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-[color:var(--color-accent)]">
+        {icon}
+      </div>
+      <p className="mt-1.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-white/70">
+        {label}
+      </p>
+    </div>
+  );
+}
+
+function FeatureChip({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-[color:var(--color-line)] bg-white/70 p-3.5 backdrop-blur-sm">
+      <div className="flex items-center gap-2 text-[color:var(--color-accent-deep)]">
+        {icon}
+        <p className="text-sm font-semibold text-[color:var(--color-ink)]">{title}</p>
+      </div>
+      <p className="mt-1 text-xs leading-relaxed text-[color:var(--color-muted)]">{body}</p>
+    </div>
+  );
+}
 
 function ReportResult({
   result,
@@ -346,85 +433,90 @@ function ReportResult({
   onNavigate: (path: RoutePath) => void;
 }) {
   return (
-    <div className="space-y-4">
-      <GlassCard strong className="p-5 sm:p-6">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <SectionEyebrow>{result.generatedBadge}</SectionEyebrow>
-            <h2 className="mt-1 font-display text-2xl font-bold tracking-normal sm:text-3xl">{studentName}</h2>
-            <p className="mt-1 text-sm text-[color:var(--color-muted)]">
-              Day {result.dayId} · {track} · {result.engine === 'gemini' ? 'Gemini' : 'Heuristic'}
-            </p>
-          </div>
-          <div className="text-center">
+    <div className="space-y-3">
+      {/* Score first — the money shot */}
+      <GlassCard strong className="overflow-hidden p-0">
+        <div className="bg-[color:var(--color-accent-soft)]/50 px-4 py-5 sm:px-6">
+          <div className="flex items-center gap-4">
             <ScoreRing score={result.overallScore} />
-            <p className="mt-2 text-sm font-semibold">{result.performanceBand}</p>
+            <div className="min-w-0 flex-1">
+              <SectionEyebrow>{result.generatedBadge}</SectionEyebrow>
+              <h2 className="mt-1 font-display text-xl font-bold tracking-normal sm:text-2xl">
+                {studentName}
+              </h2>
+              <p className="mt-1 text-xs text-[color:var(--color-muted)] sm:text-sm">
+                Day {result.dayId} · {track}
+              </p>
+              <p className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-white/70 px-2 py-1 text-xs font-semibold text-[color:var(--color-accent-deep)]">
+                {result.performanceBand}
+                <span className="text-[color:var(--color-muted)]">·</span>
+                {result.engine === 'gemini' ? 'Gemini' : 'Heuristic'}
+              </p>
+            </div>
           </div>
         </div>
 
-        {result.verifiedRepo ? (
-          <div className="mt-5 rounded-xl border border-[color:var(--color-good)]/25 bg-[color:var(--color-good-soft)] p-4">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-[color:var(--color-good)]">
-                <CheckCircle2 className="h-4 w-4" />
-                <p className="text-sm font-semibold">GitHub verified · public</p>
-              </div>
-              <VerifyBadge state="verified" />
-            </div>
-            <p className="mt-2 font-display text-lg font-bold">{result.verifiedRepo.fullName}</p>
-            <p className="mt-1 text-sm text-[color:var(--color-ink-soft)]">
-              <span className="font-mono text-xs">{result.verifiedRepo.commitSha}</span>
-              {' · '}
-              {result.verifiedRepo.commitMessage}
-            </p>
-          </div>
-        ) : (
-          <div className="mt-5">
-            <AlertBanner tone="warn" title="GitHub could not be fully verified">
-              Scores below use pasted proof only. Make the repo public and regenerate for a stronger
-              authenticity signal.
-            </AlertBanner>
-          </div>
-        )}
+        <div className="grid grid-cols-2 gap-2 p-3 sm:grid-cols-4 sm:gap-3 sm:p-4">
+          <Metric label="Code" value={result.codeQualityScore} />
+          <Metric label="Pitch" value={result.linkedinPitchScore} />
+          <Metric label="Recruiter" value={result.recruiterReadiness} />
+          <Metric label="Consistency" value={result.consistencySignal} />
+        </div>
       </GlassCard>
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <Metric label="Code quality" value={result.codeQualityScore} />
-        <Metric label="LinkedIn pitch" value={result.linkedinPitchScore} />
-        <Metric label="Recruiter ready" value={result.recruiterReadiness} />
-        <Metric label="Consistency" value={result.consistencySignal} />
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <GlassCard strong className="p-5">
-          <h3 className="font-display text-lg font-bold">AI code review</h3>
-          <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-ink-soft)]">
-            {result.codeReview.eleganceSummary}
-          </p>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
-            <ListBlock title="Strengths" items={result.codeReview.strengths} good />
-            <ListBlock title="Level-ups" items={result.codeReview.improvements} />
+      {result.verifiedRepo ? (
+        <div className="rounded-2xl border border-[color:var(--color-good)]/25 bg-[color:var(--color-good-soft)] p-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-[color:var(--color-good)]">
+              <CheckCircle2 className="h-4 w-4" />
+              <p className="text-sm font-semibold">GitHub verified · public</p>
+            </div>
+            <VerifyBadge state="verified" />
           </div>
-        </GlassCard>
+          <p className="mt-2 flex items-center gap-2 font-display text-base font-bold">
+            <Github className="h-4 w-4" />
+            {result.verifiedRepo.fullName}
+          </p>
+          <p className="mt-1 text-sm text-[color:var(--color-ink-soft)]">
+            <span className="font-mono text-xs">{result.verifiedRepo.commitSha}</span>
+            {' · '}
+            {result.verifiedRepo.commitMessage}
+          </p>
+        </div>
+      ) : (
+        <AlertBanner tone="warn" title="GitHub could not be fully verified">
+          Scores below use pasted proof only. Make the repo public and regenerate.
+        </AlertBanner>
+      )}
 
-        <GlassCard strong className="p-5">
-          <h3 className="font-display text-lg font-bold">LinkedIn recruiter feedback</h3>
-          <p className="mt-2 text-sm font-semibold text-[color:var(--color-accent-deep)]">
-            Appeal: {result.linkedinFeedback.recruiterAppeal}
-          </p>
-          <p className="mt-2 text-sm text-[color:var(--color-ink-soft)]">
-            {result.linkedinFeedback.visibilityTip}
-          </p>
-          <p className="glass-inset mt-3 rounded-xl p-3 text-sm text-[color:var(--color-ink-soft)]">
-            {result.linkedinFeedback.suggestion}
-          </p>
-        </GlassCard>
-      </div>
+      <GlassCard strong className="p-4 sm:p-5">
+        <h3 className="font-display text-base font-bold sm:text-lg">AI code review</h3>
+        <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-ink-soft)]">
+          {result.codeReview.eleganceSummary}
+        </p>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2 sm:gap-3">
+          <ListBlock title="Strengths" items={result.codeReview.strengths} good />
+          <ListBlock title="Level-ups" items={result.codeReview.improvements} />
+        </div>
+      </GlassCard>
 
-      <GlassCard strong className="p-5">
+      <GlassCard strong className="p-4 sm:p-5">
+        <h3 className="font-display text-base font-bold sm:text-lg">LinkedIn recruiter feedback</h3>
+        <p className="mt-2 text-sm font-semibold text-[color:var(--color-accent-deep)]">
+          Appeal: {result.linkedinFeedback.recruiterAppeal}
+        </p>
+        <p className="mt-2 text-sm text-[color:var(--color-ink-soft)]">
+          {result.linkedinFeedback.visibilityTip}
+        </p>
+        <p className="glass-inset mt-3 rounded-xl p-3 text-sm text-[color:var(--color-ink-soft)]">
+          {result.linkedinFeedback.suggestion}
+        </p>
+      </GlassCard>
+
+      <GlassCard strong className="p-4 sm:p-5">
         <div className="flex items-center gap-2">
           <Award className="h-4 w-4 text-[color:var(--color-signal)]" />
-          <h3 className="font-display text-lg font-bold">Skill signals</h3>
+          <h3 className="font-display text-base font-bold sm:text-lg">Skill signals</h3>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
           {result.skillSignals.map((skill) => (
@@ -436,20 +528,20 @@ function ReportResult({
             </span>
           ))}
         </div>
-        <p className="mt-4 text-sm text-[color:var(--color-muted)]">{result.timeEfficiencyNote}</p>
-        <div className="mt-4 rounded-xl border border-[color:var(--color-accent)]/20 bg-[color:var(--color-accent-soft)] p-4">
+        <p className="mt-3 text-sm text-[color:var(--color-muted)]">{result.timeEfficiencyNote}</p>
+        <div className="mt-3 rounded-xl border border-[color:var(--color-accent)]/20 bg-[color:var(--color-accent-soft)] p-3.5">
           <SectionEyebrow>Next move</SectionEyebrow>
           <p className="mt-1 text-sm font-medium">{result.nextMove}</p>
         </div>
       </GlassCard>
 
-      <div className="flex flex-col gap-2 sm:flex-row">
+      <div className="sticky bottom-3 z-20 grid grid-cols-2 gap-2 sm:static sm:flex sm:flex-row">
         <SecondaryButton className="flex-1" onClick={onReset}>
           <RefreshCw className="h-4 w-4" />
-          Analyze another
+          Again
         </SecondaryButton>
         <PrimaryButton className="flex-1" onClick={() => onNavigate('/dashboard')}>
-          Back to dashboard
+          Dashboard
           <ArrowRight className="h-4 w-4" />
         </PrimaryButton>
       </div>
@@ -458,12 +550,12 @@ function ReportResult({
 }
 
 function ScoreRing({ score }: { score: number }) {
-  const radius = 36;
+  const radius = 34;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (score / 100) * circumference;
   return (
-    <div className="relative mx-auto h-24 w-24">
-      <svg className="h-24 w-24 -rotate-90" viewBox="0 0 88 88">
+    <div className="relative h-[5.5rem] w-[5.5rem] shrink-0">
+      <svg className="h-full w-full -rotate-90" viewBox="0 0 88 88">
         <circle cx="44" cy="44" r={radius} stroke="rgba(18,28,40,0.1)" strokeWidth="8" fill="none" />
         <motion.circle
           cx="44"
@@ -488,27 +580,23 @@ function ScoreRing({ score }: { score: number }) {
 
 function Metric({ label, value }: { label: string; value: number }) {
   return (
-    <GlassCard strong className="p-4">
-      <p className="font-mono text-[10px] font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
+    <div className="rounded-xl border border-[color:var(--color-line)] bg-white/55 p-3">
+      <p className="font-mono text-[9px] font-medium uppercase tracking-wide text-[color:var(--color-muted)]">
         {label}
       </p>
-      <p className="mt-1 font-mono text-2xl font-bold tabular-nums">{value}</p>
-      <ProgressRail className="mt-2" value={value} />
-    </GlassCard>
+      <p className="mt-0.5 font-mono text-xl font-bold tabular-nums">{value}</p>
+      <ProgressRail className="mt-1.5" value={value} />
+    </div>
   );
 }
 
 function ListBlock({ title, items, good }: { title: string; items: string[]; good?: boolean }) {
   return (
-    <div
-      className={`rounded-xl p-3 ${
-        good ? 'bg-[color:var(--color-good-soft)]' : 'glass-inset'
-      }`}
-    >
+    <div className={`rounded-xl p-3 ${good ? 'bg-[color:var(--color-good-soft)]' : 'glass-inset'}`}>
       <p className="font-mono text-[10px] font-semibold uppercase tracking-wide text-[color:var(--color-muted)]">
         {title}
       </p>
-      <ul className="mt-2 space-y-2">
+      <ul className="mt-2 space-y-1.5">
         {items.map((item) => (
           <li key={item} className="text-sm leading-snug text-[color:var(--color-ink-soft)]">
             {item}
@@ -516,25 +604,5 @@ function ListBlock({ title, items, good }: { title: string; items: string[]; goo
         ))}
       </ul>
     </div>
-  );
-}
-
-function Feature({
-  icon,
-  title,
-  body,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-}) {
-  return (
-    <li className="flex gap-3">
-      <span className="mt-0.5 text-[color:var(--color-accent-deep)]">{icon}</span>
-      <div>
-        <p className="font-semibold text-[color:var(--color-ink)]">{title}</p>
-        <p className="mt-0.5 text-[color:var(--color-muted)]">{body}</p>
-      </div>
-    </li>
   );
 }

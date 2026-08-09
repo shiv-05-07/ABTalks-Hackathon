@@ -99,7 +99,7 @@ export default function App() {
           currentPath={isKnownRoute ? currentPath : '/'}
           onNavigate={navigate}
           streakCount={profile.currentStreak}
-          showStreak={currentPath !== '/'}
+          showStreak
         />
 
         <main className="relative flex-1">

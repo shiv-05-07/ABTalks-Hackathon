@@ -8,6 +8,7 @@ import {
   Moon,
   Radio,
   Share2,
+  Sparkles,
   Timer,
   Users,
 } from 'lucide-react';
@@ -97,7 +98,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center"
+            className="mt-9 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center"
           >
             <button
               type="button"
@@ -107,9 +108,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               Start Day 1
               <ArrowRight className="h-4 w-4" />
             </button>
+            <button
+              type="button"
+              onClick={() => onNavigate('/report-card')}
+              className="pressable inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-semibold text-[color:var(--color-ink)]"
+            >
+              <Sparkles className="h-4 w-4 text-[color:var(--color-accent)]" />
+              AI Report Card
+            </button>
             <a
               href="#how-it-works"
-              className="inline-flex h-12 items-center justify-center rounded-xl px-1 text-sm font-medium text-white/70 hover:text-white"
+              className="inline-flex h-11 items-center justify-center rounded-xl px-1 text-sm font-medium text-white/70 hover:text-white"
             >
               How the streak works ↓
             </a>

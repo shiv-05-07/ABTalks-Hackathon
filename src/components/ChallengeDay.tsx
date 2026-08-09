@@ -313,19 +313,54 @@ export const ChallengeDay: React.FC<ChallengeDayProps> = ({
     setFieldErrors((prev) => ({ ...prev, linkedin: undefined }));
   };
 
-  return (
-    <div className="min-h-[calc(100vh-3.5rem)] pb-28 sm:pb-16">
-      <div className="mx-auto max-w-6xl px-4 pt-4 sm:px-6 sm:pt-6">
-        <button
-          type="button"
-          onClick={() => onNavigate('/dashboard')}
-          className="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-muted)] transition hover:text-[color:var(--color-ink)]"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Dashboard
-        </button>
+  const primaryAction = () => {
+    if (step === 'brief') setStep('github');
+    else if (step === 'github' && githubVerified) setStep('linkedin');
+    else if (step === 'github') void runGithubVerify();
+    else if (step === 'linkedin' && linkedinVerified) setStep('review');
+    else if (step === 'linkedin') void runLinkedinVerify();
+    else if (step === 'review') handleSubmit();
+  };
 
-        <GlassCard strong className="mt-4 p-5" shine>
+  const primaryLabel =
+    step === 'brief'
+      ? 'Start proof submission'
+      : step === 'github'
+        ? githubVerified
+          ? 'Next: LinkedIn'
+          : 'Verify GitHub'
+        : step === 'linkedin'
+          ? linkedinVerified
+            ? 'Review'
+            : 'Verify LinkedIn'
+          : `Submit Day ${dayId}`;
+
+  return (
+    <div className="min-h-[calc(100vh-6.5rem)] pb-10 sm:pb-16">
+      <div className="mx-auto max-w-6xl px-3 pt-3 sm:px-6 sm:pt-6">
+        <div className="flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => onNavigate('/dashboard')}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-[color:var(--color-muted)] transition hover:text-[color:var(--color-ink)]"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Dashboard
+          </button>
+          {!submitted && <DeadlineClock compact />}
+        </div>
+
+        {/* Sticky top CTA — mobile-first, not bottom */}
+        {!submitted && (
+          <div className="sticky top-[6.5rem] z-30 mt-3 rounded-2xl border border-[color:var(--color-line)] bg-white/90 p-2 shadow-sm backdrop-blur-xl sm:top-[7rem]">
+            <PrimaryButton className="w-full" onClick={primaryAction}>
+              {verifying ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {primaryLabel}
+            </PrimaryButton>
+          </div>
+        )}
+
+        <GlassCard strong className="mt-3 p-4 sm:mt-4 sm:p-5" shine>
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-[color:var(--color-accent-deep)]">
               Day {dayId} / 60
@@ -405,8 +440,35 @@ export const ChallengeDay: React.FC<ChallengeDayProps> = ({
           )}
         </AnimatePresence>
 
-        <div className="mt-4 grid gap-4 lg:grid-cols-5">
-          <div className="lg:col-span-3">
+        <div className="mt-3 grid gap-3 sm:mt-4 sm:gap-4 lg:grid-cols-5">
+          {/* Tools first on mobile */}
+          <aside className="order-1 space-y-3 lg:order-2 lg:col-span-2 lg:space-y-4">
+            <GlassCard className="p-4 sm:p-5">
+              <div className="flex items-center gap-2 text-[color:var(--color-accent-deep)]">
+                <Sparkles className="h-4 w-4" />
+                <h2 className="font-display text-base font-bold">Proof status</h2>
+              </div>
+              <div className="mt-3 space-y-2">
+                <StatusLine label="GitHub" state={ghStatus} />
+                <StatusLine label="LinkedIn" state={liStatus} />
+                <StatusLine label="Day submission" state={submitted ? 'verified' : 'idle'} />
+              </div>
+            </GlassCard>
+
+            <GlassCard className="p-4 sm:p-5">
+              <FocusTimer defaultMinutes={challenge.estimatedMinutes} />
+            </GlassCard>
+
+            <GlassCard className="hidden p-5 lg:block">
+              <h2 className="font-display text-base font-bold">Late-night tip</h2>
+              <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-muted)]">
+                Ship the smallest slice that meets acceptance criteria. One concrete learning in the
+                post beats a long thread you never publish.
+              </p>
+            </GlassCard>
+          </aside>
+
+          <div className="order-2 lg:order-1 lg:col-span-3">
             <AnimatePresence mode="wait">
               <motion.div
                 key={step}
@@ -849,68 +911,8 @@ export const ChallengeDay: React.FC<ChallengeDayProps> = ({
               </motion.div>
             </AnimatePresence>
           </div>
-
-          <aside className="space-y-4 lg:col-span-2">
-            {!submitted && (
-              <div className="flex items-center justify-between gap-2">
-                <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-[color:var(--color-muted)]">
-                  Soft deadline
-                </p>
-                <DeadlineClock compact />
-              </div>
-            )}
-
-            <GlassCard className="p-5">
-              <FocusTimer defaultMinutes={challenge.estimatedMinutes} />
-            </GlassCard>
-
-            <GlassCard className="p-5">
-              <div className="flex items-center gap-2 text-[color:var(--color-accent-deep)]">
-                <Sparkles className="h-4 w-4" />
-                <h2 className="font-display text-base font-bold">Proof status</h2>
-              </div>
-              <div className="mt-4 space-y-2">
-                <StatusLine label="GitHub" state={ghStatus} />
-                <StatusLine label="LinkedIn" state={liStatus} />
-                <StatusLine label="Day submission" state={submitted ? 'verified' : 'idle'} />
-              </div>
-              <p className="mt-4 text-xs leading-relaxed text-[color:var(--color-muted)]">
-                Recruiters only trust what they can open. If a link fails verification here, it
-                likely fails their click-through too.
-              </p>
-            </GlassCard>
-
-            <GlassCard className="p-5">
-              <h2 className="font-display text-base font-bold">Late-night tip</h2>
-              <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-muted)]">
-                Ship the smallest slice that meets acceptance criteria. One concrete learning in the
-                post beats a long thread you never publish.
-              </p>
-            </GlassCard>
-          </aside>
         </div>
       </div>
-
-      {!submitted && (
-        <div className="glass-nav fixed inset-x-0 bottom-0 z-40 border-t p-3 md:hidden">
-          <PrimaryButton
-            className="w-full"
-            onClick={() => {
-              if (step === 'brief') setStep('github');
-              else if (step === 'github' && githubVerified) setStep('linkedin');
-              else if (step === 'github') void runGithubVerify();
-              else if (step === 'linkedin' && linkedinVerified) setStep('review');
-              else if (step === 'linkedin') void runLinkedinVerify();
-              else if (step === 'review') handleSubmit();
-            }}
-          >
-            {step === 'brief' && 'Start proof submission'}
-            {step === 'github' && (githubVerified ? 'Next: LinkedIn' : 'Verify GitHub')}
-            {step === 'linkedin' && (linkedinVerified ? 'Review' : 'Verify LinkedIn')}
-            {step === 'review' && `Submit Day ${dayId}`}
-          </PrimaryButton>
-        </div>
-      )}
     </div>
   );
 };
