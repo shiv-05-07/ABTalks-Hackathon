@@ -6,6 +6,7 @@ import { HowItWorks } from './components/HowItWorks';
 import { JourneyProgress } from './components/JourneyProgress';
 import { StudentDashboard } from './components/StudentDashboard';
 import { ChallengeDay } from './components/ChallengeDay';
+import { StudentReportCard } from './components/StudentReportCard';
 import { Footer } from './components/Footer';
 import { DEFAULT_STUDENT_PROFILE, MOCK_SUBMISSIONS, getChallengeForDay } from './data/mockData';
 import { StudentProfile, ProofSubmission, RoutePath } from './types';
@@ -67,7 +68,8 @@ export default function App() {
     return match ? parseInt(match[1], 10) : 12;
   };
 
-  const isDayRoute = currentPath.startsWith('/day/') || currentPath === '/day/12';
+  const isReportCardRoute = currentPath === '/report-card';
+  const isDayRoute = !isReportCardRoute && (currentPath.startsWith('/day/') || currentPath === '/day/12');
   const currentDayId = isDayRoute ? getDayIdFromPath(currentPath) : 12;
 
   return (
@@ -105,6 +107,13 @@ export default function App() {
           />
         )}
 
+        {/* AI Report Card View */}
+        {isReportCardRoute && (
+          <div className="bg-zinc-950 py-8 min-h-[calc(100vh-64px)]">
+            <StudentReportCard />
+          </div>
+        )}
+
         {isDayRoute && (
           <ChallengeDay
             dayId={currentDayId}
@@ -117,11 +126,10 @@ export default function App() {
         )}
       </main>
 
-      {/* Footer only for main home or dashboard */}
-      {currentPath !== '/day/12' && !currentPath.startsWith('/day/') && (
+      {/* Footer shown on home, dashboard, and report card */}
+      {!isDayRoute && (
         <Footer />
       )}
     </div>
   );
 }
-

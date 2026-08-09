@@ -1,5 +1,5 @@
 import React from 'react';
-import { Flame } from 'lucide-react';
+import { Flame, Award } from 'lucide-react';
 import { RoutePath } from '../types';
 
 interface NavbarProps {
@@ -8,7 +8,11 @@ interface NavbarProps {
   streakCount?: number;
 }
 
-export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, streakCount = 11 }) => {
+export const Navbar: React.FC<NavbarProps> = ({
+  currentPath,
+  onNavigate,
+  streakCount = 11,
+}) => {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-[#dedede] select-none">
       <div className="max-w-[1180px] mx-auto px-3 sm:px-6 h-14 md:h-16 flex items-center justify-between gap-1.5 sm:gap-4">
@@ -60,6 +64,20 @@ export const Navbar: React.FC<NavbarProps> = ({ currentPath, onNavigate, streakC
           >
             Day 12
             {currentPath.startsWith('/day/') && (
+              <span className="absolute -bottom-2.5 sm:-bottom-3.5 left-0 right-0 h-[2px] bg-black rounded-full" />
+            )}
+          </button>
+
+          {/* New AI Report Card Link */}
+          <button
+            onClick={() => onNavigate('/report-card')}
+            className={`relative text-xs sm:text-sm font-medium transition-colors cursor-pointer focus:outline-none whitespace-nowrap flex items-center gap-1.5 ${
+              currentPath === '/report-card' ? 'text-black font-semibold' : 'text-neutral-500 hover:text-black'
+            }`}
+          >
+            <Award className="w-3.5 h-3.5 text-amber-500" />
+            <span>AI Report Card</span>
+            {currentPath === '/report-card' && (
               <span className="absolute -bottom-2.5 sm:-bottom-3.5 left-0 right-0 h-[2px] bg-black rounded-full" />
             )}
           </button>
