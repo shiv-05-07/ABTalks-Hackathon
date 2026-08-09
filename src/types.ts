@@ -124,3 +124,4 @@ export interface AIProofAnalysisResult {
   timeEfficiencyNote: string;
   generatedBadge: string;
 }
+
